@@ -36933,6 +36933,9 @@
 	  generateModels(state);
 	  generateApi(state);
 	  generateIndexJs(state);
+	  generateConfigs(state);
+	  generateApp(state);
+	  generatePublic(state);
 	};
 	
 	function generatePackage(state) {
@@ -36964,7 +36967,6 @@
 	}
 	
 	function generateApi(state) {
-	  //TODO api folder and v1
 	  fs.mkdir(state.location + '/api', function (err) {
 	    if (err) {
 	      dialog.showErrorBox('Error', 'Error creating /api\napi folder probably already exists\n' + JSON.stringify(err));
@@ -36980,7 +36982,6 @@
 	}
 	
 	function generateIndexJs(state) {
-	  //TODO index.js
 	  var dbPath = state.dbUrlType === 'ENV' ? 'process.env.' + state.dbPath : '"' + state.dbPath + '"';
 	  var port = state.portType === 'ENV' ? 'process.env.' + state.port : '' + state.port;
 	  var indexJs = '\'use strict\';\n\nconst express = require(\'express\');\nconst app = express();\nconst bodyParser = require(\'body-parser\');\nconst http = require(\'http\').Server(app);\nconst Sequelize = require(\'sequelize\');\nconst db = new Sequelize(' + dbPath + ', {\n  logging: false\n});\n\n//sync all sequelize models\ndb.sync();\n\nconst models = db.import(__dirname + \'/models\');\n\n//parse application/json\napp.use(bodyParser.json());\napp.use(bodyParser.urlencoded({ extended: false }));\n\n//Deliver the public folder statically\napp.use(express.static(\'public\'));\n\n//This tells the server to listen\nhttp.listen(' + port + ', function(){\n  console.log(\'Example app listening on port\', credentials.PORT, \'!\');\n});\n\n//This is the options object that will be passed to the api files\nlet apiOptions = {\n  app: app,\n  models: models\n};\n\n//Load the api versions\nrequire(\'./api/v1\')(apiOptions);\n\n/*\n * This tells the server to always serve index.html no matter what,\n * excluding the previously defined api routes. This is so we can use\n * react-router\'s browserHistory feature.\n */\napp.get(\'*\', function(req, res){\n  res.sendFile(__dirname+\'/public/html/index.html\');\n});\n';
@@ -36992,11 +36993,33 @@
 	}
 	
 	function generateConfigs(state) {
-	  //TODO webpack.config.js .babelrc
+	  var webpackConfigJs = 'var webpack = require(\'webpack\');\nvar path = require(\'path\');\n\nvar BUILD_DIR = path.resolve(__dirname, \'public/js\');\nvar APP_DIR = path.resolve(__dirname, \'app\');\n\nvar config = {\n  entry: APP_DIR + \'/index.jsx\',\n  output: {\n    path: BUILD_DIR,\n    filename: \'bundle.js\'\n  },\n  module : {\n    loaders : [\n      {\n        test : /.jsx?/,\n        include : APP_DIR,\n        loader : \'babel\'\n      }\n    ]\n  }\n};\n\nmodule.exports = config;\n';
+	  var babelRc = '{\n  "presets" : ["es2015", "react"]\n}\n';
+	  fs.writeFile(state.location + '/webpack.config.js', webpackConfigJs, function (err) {
+	    if (err) {
+	      dialog.showErrorBox('Error', 'Error creating webpack.config.js\n' + JSON.stringify(err));
+	    }
+	  });
+	  fs.writeFile(state.location + '/babelrc', babelRc, function (err) {
+	    if (err) {
+	      dialog.showErrorBox('Error', 'Error creating babelrc\n' + JSON.stringify(err));
+	    }
+	  });
 	}
 	
 	function generateApp(state) {
-	  //TODO everything in app
+	  fs.mkdir(state.location + '/app', function (err) {
+	    if (err) {
+	      dialog.showErrorBox('Error', 'Error creating /app\napp folder probably already exists\n' + JSON.stringify(err));
+	    }
+	
+	    var indexJsx = 'import \'babel-polyfill\';\nimport React from \'react\';\nimport {Router, Route, IndexRoute, browserHistory} from \'react-router\';\nimport {render} from \'react-dom\';\n\nvar App = React.createClass({\n  render: function() {\n    return (\n      <div className="content">\n        {React.Children.map(this.props.children, child => {\n          return React.cloneElement(child, {\n            data: this.state\n          });\n        })}\n      </div>\n    );\n  }\n});\n\nvar Index = React.createClass({\n  render: function() {\n    return (\n      <div></div>\n    );\n  }\n});\n\nrender(\n  <Router history={browserHistory}>\n    <Route path="/" component={App}>\n      <IndexRoute component={Index}/>\n    </Route>\n  </Router>,\n  document.getElementById(\'app\')\n);\n';
+	    fs.writeFile(state.location + '/app/index.jsx', indexJsx, function (err) {
+	      if (err) {
+	        dialog.showErrorBox('Error', 'Error creating /app/index.jsx\n' + JSON.stringify(err));
+	      }
+	    });
+	  });
 	}
 	
 	function generatePublic(state) {

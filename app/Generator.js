@@ -7,6 +7,9 @@ export var generate = function(state){
   generateModels(state);
   generateApi(state);
   generateIndexJs(state);
+  generateConfigs(state);
+  generateApp(state);
+  generatePublic(state);
 };
 
 function generatePackage(state){
@@ -65,7 +68,6 @@ ${JSON.stringify(err)}`);
 }
 
 function generateApi(state){
-  //TODO api folder and v1
   fs.mkdir(state.location+'/api', function(err){
     if (err){
       dialog.showErrorBox('Error', `Error creating /api
@@ -102,7 +104,6 @@ ${JSON.stringify(err)}`);
 }
 
 function generateIndexJs(state){
-  //TODO index.js
   var dbPath = state.dbUrlType === 'ENV' ?
   'process.env.'+state.dbPath : `"${state.dbPath}"`;
   var port = state.portType === 'ENV' ?
@@ -162,11 +163,100 @@ ${JSON.stringify(err)}`);
 }
 
 function generateConfigs(state){
-  //TODO webpack.config.js .babelrc
+  var webpackConfigJs = `var webpack = require('webpack');
+var path = require('path');
+
+var BUILD_DIR = path.resolve(__dirname, 'public/js');
+var APP_DIR = path.resolve(__dirname, 'app');
+
+var config = {
+  entry: APP_DIR + '/index.jsx',
+  output: {
+    path: BUILD_DIR,
+    filename: 'bundle.js'
+  },
+  module : {
+    loaders : [
+      {
+        test : /\.jsx?/,
+        include : APP_DIR,
+        loader : 'babel'
+      }
+    ]
+  }
+};
+
+module.exports = config;
+`;
+  var babelRc = `{
+  "presets" : ["es2015", "react"]
+}
+`;
+  fs.writeFile(state.location+'/webpack.config.js', webpackConfigJs, function(err){
+    if (err){
+      dialog.showErrorBox('Error', `Error creating webpack.config.js
+${JSON.stringify(err)}`);
+    }
+  });
+  fs.writeFile(state.location+'/babelrc', babelRc, function(err){
+    if (err){
+      dialog.showErrorBox('Error', `Error creating babelrc
+${JSON.stringify(err)}`);
+    }
+  });
 }
 
 function generateApp(state){
-  //TODO everything in app
+  fs.mkdir(state.location+'/app', function(err){
+    if (err){
+      dialog.showErrorBox('Error', `Error creating /app
+app folder probably already exists
+${JSON.stringify(err)}`);
+    }
+
+    var indexJsx = `import 'babel-polyfill';
+import React from 'react';
+import {Router, Route, IndexRoute, browserHistory} from 'react-router';
+import {render} from 'react-dom';
+
+var App = React.createClass({
+  render: function() {
+    return (
+      <div className="content">
+        {React.Children.map(this.props.children, child => {
+          return React.cloneElement(child, {
+            data: this.state
+          });
+        })}
+      </div>
+    );
+  }
+});
+
+var Index = React.createClass({
+  render: function() {
+    return (
+      <div></div>
+    );
+  }
+});
+
+render(
+  <Router history={browserHistory}>
+    <Route path="/" component={App}>
+      <IndexRoute component={Index}/>
+    </Route>
+  </Router>,
+  document.getElementById('app')
+);
+`;
+    fs.writeFile(state.location+'/app/index.jsx', indexJsx, function(err){
+      if (err){
+        dialog.showErrorBox('Error', `Error creating /app/index.jsx
+${JSON.stringify(err)}`);
+      }
+    });
+  });
 }
 
 function generatePublic(state){
