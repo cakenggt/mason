@@ -59,6 +59,8 @@
 	
 	var _reactDom = __webpack_require__(/*! react-dom */ 393);
 	
+	var _generator = __webpack_require__(/*! ./generator */ 531);
+	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
 	var dialog = window.require('electron').remote.dialog;
@@ -68,7 +70,8 @@
 	
 	  getInitialState: function getInitialState() {
 	    return {
-	      location: ''
+	      location: '',
+	      db: 'PostgreSQL'
 	    };
 	  },
 	  render: function render() {
@@ -88,15 +91,18 @@
 	        _react2.default.Children.map(this.props.children, function (child) {
 	          return _react2.default.cloneElement(child, {
 	            data: _this.state,
-	            setMainState: _this.setMainState
+	            setMainState: _this.setMainState,
+	            generate: _this.generate
 	          });
 	        })
 	      )
 	    );
 	  },
 	  setMainState: function setMainState(state) {
-	    console.log('got to set main state');
 	    this.setState(state);
+	  },
+	  generate: function generate() {
+	    (0, _generator.generate)(this.state);
 	  }
 	});
 	
@@ -107,9 +113,26 @@
 	    setMainState: _react2.default.PropTypes.func
 	  },
 	  render: function render() {
+	    var nextLink = '';
+	    if (this.props.data.location) {
+	      nextLink = _react2.default.createElement(
+	        _reactRouter.Link,
+	        { to: '/database' },
+	        _react2.default.createElement(
+	          'span',
+	          null,
+	          'Next'
+	        )
+	      );
+	    }
 	    return _react2.default.createElement(
 	      'div',
 	      null,
+	      _react2.default.createElement(
+	        'h2',
+	        null,
+	        'Project Location'
+	      ),
 	      _react2.default.createElement(
 	        'div',
 	        null,
@@ -120,7 +143,8 @@
 	        {
 	          onClick: this.openFolder },
 	        'Open Folder'
-	      )
+	      ),
+	      nextLink
 	    );
 	  },
 	  openFolder: function openFolder() {
@@ -136,13 +160,74 @@
 	  }
 	});
 	
+	var DatabaseElement = _react2.default.createClass({
+	  displayName: 'DatabaseElement',
+	
+	  propTypes: {
+	    setMainState: _react2.default.PropTypes.func
+	  },
+	  render: function render() {
+	    var databases = ['PostgreSQL', 'SQLite'];
+	    var databaseOptions = databases.map(function (elem, i) {
+	      return _react2.default.createElement(
+	        'option',
+	        {
+	          key: elem,
+	          value: elem },
+	        elem
+	      );
+	    });
+	    return _react2.default.createElement(
+	      'div',
+	      null,
+	      _react2.default.createElement(
+	        'h2',
+	        null,
+	        'Database'
+	      ),
+	      _react2.default.createElement(
+	        'div',
+	        null,
+	        'Select your database',
+	        _react2.default.createElement(
+	          'select',
+	          {
+	            onChange: this.selectDb,
+	            value: this.props.data.db },
+	          databaseOptions
+	        )
+	      ),
+	      _react2.default.createElement(
+	        _reactRouter.Link,
+	        { to: '/' },
+	        _react2.default.createElement(
+	          'span',
+	          null,
+	          'Back'
+	        )
+	      ),
+	      _react2.default.createElement(
+	        'span',
+	        {
+	          onClick: this.props.generate },
+	        'Generate!'
+	      )
+	    );
+	  },
+	  selectDb: function selectDb(e) {
+	    console.log(e.target.value);
+	    this.props.setMainState({ db: e.target.value });
+	  }
+	});
+	
 	(0, _reactDom.render)(_react2.default.createElement(
 	  _reactRouter.Router,
 	  { history: _reactRouter.hashHistory },
 	  _react2.default.createElement(
 	    _reactRouter.Route,
 	    { path: '/', component: App },
-	    _react2.default.createElement(_reactRouter.IndexRoute, { component: LocationElement })
+	    _react2.default.createElement(_reactRouter.IndexRoute, { component: LocationElement }),
+	    _react2.default.createElement(_reactRouter.Route, { path: 'database', component: DatabaseElement })
 	  )
 	), document.getElementById('app'));
 
@@ -36701,6 +36786,54 @@
 	
 	module.exports = ReactDOMNullInputValuePropHook;
 	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(/*! ./~/process/browser.js */ 294)))
+
+/***/ },
+/* 531 */
+/*!**************************!*\
+  !*** ./app/generator.js ***!
+  \**************************/
+/***/ function(module, exports) {
+
+	'use strict';
+	
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+	var fs = window.require('fs');
+	
+	var generate = exports.generate = function generate(state) {
+	  console.log('generating stubs');
+	  generatePackage(state);
+	};
+	
+	function generatePackage(state) {
+	  var packageJsonLocation = state.location + '/package.json';
+	  var packageJson = {
+	    "dependencies": {
+	      "babel-loader": "^6.2.5",
+	      "babel-polyfill": "^6.13.0",
+	      "babel-preset-es2015": "^6.13.2",
+	      "babel-preset-react": "^6.11.1",
+	      "body-parser": "^1.15.2",
+	      "express": "^4.14.0",
+	      "react": "^15.3.1",
+	      "react-dom": "^15.3.1",
+	      "react-router": "^2.7.0",
+	      "sequelize": "^3.24.1",
+	      "webpack": "^1.13.2"
+	    }
+	  };
+	  switch (state.db) {
+	    case 'PostgreSQL':
+	      packageJson.dependencies.pg = "^6.1.0";
+	      break;
+	    case 'SQLite':
+	      packageJson.dependencies.sqlite = "^2.2.0";
+	      break;
+	  }
+	  fs.writeFile(packageJsonLocation, JSON.stringify(packageJson));
+	  console.log('wrote file to', packageJsonLocation);
+	}
 
 /***/ }
 /******/ ]);
