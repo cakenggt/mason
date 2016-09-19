@@ -9,7 +9,11 @@ var App = React.createClass({
   getInitialState: function() {
     return {
       location: '',
-      db: 'PostgreSQL'
+      db: 'PostgreSQL',
+      dbUrlType: 'ENV',
+      dbPath: 'DATABASE_URL',
+      portType: 'ENV',
+      port: 'PORT'
     };
   },
   render: function() {
@@ -46,7 +50,7 @@ var LocationElement = React.createClass({
     var nextLink = '';
     if (this.props.data.location){
       nextLink = (
-        <Link to="/database">
+        <Link to="/server">
           <span>Next</span>
         </Link>
       );
@@ -73,6 +77,53 @@ var LocationElement = React.createClass({
         this.props.setMainState({location: directory});
       }
     });
+  }
+});
+
+var ServerElement = React.createClass({
+  propTypes: {
+    setMainState: React.PropTypes.func,
+  },
+  render: function(){
+    var inputType = this.props.data.portType === 'ENV' ?
+      'text' : 'number';
+    return (
+      <div>
+        <h2>Server</h2>
+        <div>
+          <h3>Server Options</h3>
+          Port Type
+          <select
+            onChange={this.changePortType}
+            value={this.props.data.portType}>
+            <option
+              value="ENV">Environment Variable</option>
+            <option
+              value="NUMBER">Hard Coded Number</option>
+          </select><br/>
+          Port
+          <input
+            type={inputType}
+            value={this.props.data.port}
+            onChange={this.changePort}/>
+        </div>
+        <Link to="/">
+          <span>Back</span>
+        </Link>
+        <Link to="/database">
+          <span>Next</span>
+        </Link>
+      </div>
+    )
+  },
+  selectDb: function(e){
+    this.props.setMainState({db: e.target.value});
+  },
+  changePortType: function(e){
+    this.props.setMainState({portType: e.target.value});
+  },
+  changePort: function(e){
+    this.props.setMainState({port: e.target.value});
   }
 });
 
@@ -105,7 +156,24 @@ var DatabaseElement = React.createClass({
             {databaseOptions}
           </select>
         </div>
-        <Link to="/">
+        <div>
+          <h3>Database Credentials</h3>
+          Type
+          <select
+            onChange={this.changeType}
+            value={this.props.data.dbUrlType}>
+            <option
+              value="ENV">Environment Variable</option>
+            <option
+              value="URL">Hard Coded URL</option>
+          </select><br/>
+          Path
+          <input
+            type="text"
+            value={this.props.data.dbPath}
+            onChange={this.changePath}/>
+        </div>
+        <Link to="/server">
           <span>Back</span>
         </Link>
         <span
@@ -114,8 +182,13 @@ var DatabaseElement = React.createClass({
     )
   },
   selectDb: function(e){
-    console.log(e.target.value);
     this.props.setMainState({db: e.target.value});
+  },
+  changeType: function(e){
+    this.props.setMainState({dbUrlType: e.target.value});
+  },
+  changePath: function(e){
+    this.props.setMainState({dbPath: e.target.value});
   }
 });
 
@@ -123,6 +196,7 @@ render(
   <Router history={hashHistory}>
     <Route path="/" component={App}>
       <IndexRoute component={LocationElement}/>
+      <Route path="server" component={ServerElement}/>
       <Route path="database" component={DatabaseElement}/>
     </Route>
   </Router>,

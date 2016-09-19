@@ -71,7 +71,11 @@
 	  getInitialState: function getInitialState() {
 	    return {
 	      location: '',
-	      db: 'PostgreSQL'
+	      db: 'PostgreSQL',
+	      dbUrlType: 'ENV',
+	      dbPath: 'DATABASE_URL',
+	      portType: 'ENV',
+	      port: 'PORT'
 	    };
 	  },
 	  render: function render() {
@@ -117,7 +121,7 @@
 	    if (this.props.data.location) {
 	      nextLink = _react2.default.createElement(
 	        _reactRouter.Link,
-	        { to: '/database' },
+	        { to: '/server' },
 	        _react2.default.createElement(
 	          'span',
 	          null,
@@ -160,6 +164,87 @@
 	  }
 	});
 	
+	var ServerElement = _react2.default.createClass({
+	  displayName: 'ServerElement',
+	
+	  propTypes: {
+	    setMainState: _react2.default.PropTypes.func
+	  },
+	  render: function render() {
+	    var inputType = this.props.data.portType === 'ENV' ? 'text' : 'number';
+	    return _react2.default.createElement(
+	      'div',
+	      null,
+	      _react2.default.createElement(
+	        'h2',
+	        null,
+	        'Server'
+	      ),
+	      _react2.default.createElement(
+	        'div',
+	        null,
+	        _react2.default.createElement(
+	          'h3',
+	          null,
+	          'Server Options'
+	        ),
+	        'Port Type',
+	        _react2.default.createElement(
+	          'select',
+	          {
+	            onChange: this.changePortType,
+	            value: this.props.data.portType },
+	          _react2.default.createElement(
+	            'option',
+	            {
+	              value: 'ENV' },
+	            'Environment Variable'
+	          ),
+	          _react2.default.createElement(
+	            'option',
+	            {
+	              value: 'NUMBER' },
+	            'Hard Coded Number'
+	          )
+	        ),
+	        _react2.default.createElement('br', null),
+	        'Port',
+	        _react2.default.createElement('input', {
+	          type: inputType,
+	          value: this.props.data.port,
+	          onChange: this.changePort })
+	      ),
+	      _react2.default.createElement(
+	        _reactRouter.Link,
+	        { to: '/' },
+	        _react2.default.createElement(
+	          'span',
+	          null,
+	          'Back'
+	        )
+	      ),
+	      _react2.default.createElement(
+	        _reactRouter.Link,
+	        { to: '/database' },
+	        _react2.default.createElement(
+	          'span',
+	          null,
+	          'Next'
+	        )
+	      )
+	    );
+	  },
+	  selectDb: function selectDb(e) {
+	    this.props.setMainState({ db: e.target.value });
+	  },
+	  changePortType: function changePortType(e) {
+	    this.props.setMainState({ portType: e.target.value });
+	  },
+	  changePort: function changePort(e) {
+	    this.props.setMainState({ port: e.target.value });
+	  }
+	});
+	
 	var DatabaseElement = _react2.default.createClass({
 	  displayName: 'DatabaseElement',
 	
@@ -198,8 +283,42 @@
 	        )
 	      ),
 	      _react2.default.createElement(
+	        'div',
+	        null,
+	        _react2.default.createElement(
+	          'h3',
+	          null,
+	          'Database Credentials'
+	        ),
+	        'Type',
+	        _react2.default.createElement(
+	          'select',
+	          {
+	            onChange: this.changeType,
+	            value: this.props.data.dbUrlType },
+	          _react2.default.createElement(
+	            'option',
+	            {
+	              value: 'ENV' },
+	            'Environment Variable'
+	          ),
+	          _react2.default.createElement(
+	            'option',
+	            {
+	              value: 'URL' },
+	            'Hard Coded URL'
+	          )
+	        ),
+	        _react2.default.createElement('br', null),
+	        'Path',
+	        _react2.default.createElement('input', {
+	          type: 'text',
+	          value: this.props.data.dbPath,
+	          onChange: this.changePath })
+	      ),
+	      _react2.default.createElement(
 	        _reactRouter.Link,
-	        { to: '/' },
+	        { to: '/server' },
 	        _react2.default.createElement(
 	          'span',
 	          null,
@@ -215,8 +334,13 @@
 	    );
 	  },
 	  selectDb: function selectDb(e) {
-	    console.log(e.target.value);
 	    this.props.setMainState({ db: e.target.value });
+	  },
+	  changeType: function changeType(e) {
+	    this.props.setMainState({ dbUrlType: e.target.value });
+	  },
+	  changePath: function changePath(e) {
+	    this.props.setMainState({ dbPath: e.target.value });
 	  }
 	});
 	
@@ -227,6 +351,7 @@
 	    _reactRouter.Route,
 	    { path: '/', component: App },
 	    _react2.default.createElement(_reactRouter.IndexRoute, { component: LocationElement }),
+	    _react2.default.createElement(_reactRouter.Route, { path: 'server', component: ServerElement }),
 	    _react2.default.createElement(_reactRouter.Route, { path: 'database', component: DatabaseElement })
 	  )
 	), document.getElementById('app'));
@@ -36800,39 +36925,82 @@
 	  value: true
 	});
 	var fs = window.require('fs');
+	var dialog = window.require('electron').remote.dialog;
 	
 	var generate = exports.generate = function generate(state) {
-	  console.log('generating stubs');
+	  console.log('generating stubs with state', state);
 	  generatePackage(state);
+	  generateModels(state);
+	  generateApi(state);
+	  generateIndexJs(state);
 	};
 	
 	function generatePackage(state) {
-	  var packageJsonLocation = state.location + '/package.json';
-	  var packageJson = {
-	    "dependencies": {
-	      "babel-loader": "^6.2.5",
-	      "babel-polyfill": "^6.13.0",
-	      "babel-preset-es2015": "^6.13.2",
-	      "babel-preset-react": "^6.11.1",
-	      "body-parser": "^1.15.2",
-	      "express": "^4.14.0",
-	      "react": "^15.3.1",
-	      "react-dom": "^15.3.1",
-	      "react-router": "^2.7.0",
-	      "sequelize": "^3.24.1",
-	      "webpack": "^1.13.2"
-	    }
-	  };
+	  var db = '';
 	  switch (state.db) {
 	    case 'PostgreSQL':
-	      packageJson.dependencies.pg = "^6.1.0";
+	      db = '"pg": "^6.1.0",';
 	      break;
 	    case 'SQLite':
-	      packageJson.dependencies.sqlite = "^2.2.0";
+	      db = '"sqlite": "^2.2.0",';
 	      break;
 	  }
-	  fs.writeFile(packageJsonLocation, JSON.stringify(packageJson));
-	  console.log('wrote file to', packageJsonLocation);
+	
+	  var packageJson = '{\n  "dependencies": {\n    "babel-loader": "^6.2.5",\n    "babel-polyfill": "^6.13.0",\n    "babel-preset-es2015": "^6.13.2",\n    "babel-preset-react": "^6.11.1",\n    "body-parser": "^1.15.2",\n    "express": "^4.14.0",\n    "react": "^15.3.1",\n    "react-dom": "^15.3.1",\n    "react-router": "^2.7.0",\n    "sequelize": "^3.24.1",\n    "webpack": "^1.13.2",\n    ' + db + '\n  }\n}';
+	  fs.writeFile(state.location + '/package.json', packageJson, function (err) {
+	    if (err) {
+	      dialog.showErrorBox('Error', 'Error creating package.json\n' + JSON.stringify(err));
+	    }
+	  });
+	}
+	
+	function generateModels(state) {
+	  var modelsJs = 'module.exports = function(sequelize, DataTypes) {\n\n  /**\n   * All of your model definitions go here.\n   * Return an object where each key is a model\n   * name and the value is the result of sequelize.define\n   * Don\'t forget to use the provided DataTypes object to define\n   * your column data types\n   */\n\n};';
+	  fs.writeFile(state.location + '/models.js', modelsJs, function (err) {
+	    if (err) {
+	      dialog.showErrorBox('Error', 'Error creating models.js\n' + JSON.stringify(err));
+	    }
+	  });
+	}
+	
+	function generateApi(state) {
+	  //TODO api folder and v1
+	  fs.mkdir(state.location + '/api', function (err) {
+	    if (err) {
+	      dialog.showErrorBox('Error', 'Error creating /api\napi folder probably already exists\n' + JSON.stringify(err));
+	    }
+	
+	    var v1 = '\'use strict\';\nconst prefix = \'/api/v1/\';\n\nmodule.exports = function(options){\n\n  //This is your express app object\n  let app = options.app;\n  //This is the map of all of your sequelize models\n  let models = options.models;\n\n  /**\n   * All of your api routes go here.\n   * Format them in the following way:\n   * app.post(prefix+\'endpoint\', callback);\n   * app.get(prefix+\'endpoint\', callback);\n   */\n\n};';
+	    fs.writeFile(state.location + '/api/v1.js', v1, function (err) {
+	      if (err) {
+	        dialog.showErrorBox('Error', 'Error creating /api/v1.js\napi folder probably doesn\'t exist\n' + JSON.stringify(err));
+	      }
+	    });
+	  });
+	}
+	
+	function generateIndexJs(state) {
+	  //TODO index.js
+	  var dbPath = state.dbUrlType === 'ENV' ? 'process.env.' + state.dbPath : '"' + state.dbPath + '"';
+	  var port = state.portType === 'ENV' ? 'process.env.' + state.port : '' + state.port;
+	  var indexJs = '\'use strict\';\n\nconst express = require(\'express\');\nconst app = express();\nconst bodyParser = require(\'body-parser\');\nconst http = require(\'http\').Server(app);\nconst Sequelize = require(\'sequelize\');\nconst db = new Sequelize(' + dbPath + ', {\n  logging: false\n});\n\n//sync all sequelize models\ndb.sync();\n\nconst models = db.import(__dirname + \'/models\');\n\n//parse application/json\napp.use(bodyParser.json());\napp.use(bodyParser.urlencoded({ extended: false }));\n\n//Deliver the public folder statically\napp.use(express.static(\'public\'));\n\n//This tells the server to listen\nhttp.listen(' + port + ', function(){\n  console.log(\'Example app listening on port\', credentials.PORT, \'!\');\n});\n\n//This is the options object that will be passed to the api files\nlet apiOptions = {\n  app: app,\n  models: models\n};\n\n//Load the api versions\nrequire(\'./api/v1\')(apiOptions);\n\n/*\n * This tells the server to always serve index.html no matter what,\n * excluding the previously defined api routes. This is so we can use\n * react-router\'s browserHistory feature.\n */\napp.get(\'*\', function(req, res){\n  res.sendFile(__dirname+\'/public/html/index.html\');\n});\n';
+	  fs.writeFile(state.location + '/index.js', indexJs, function (err) {
+	    if (err) {
+	      dialog.showErrorBox('Error', 'Error creating index.js\n' + JSON.stringify(err));
+	    }
+	  });
+	}
+	
+	function generateConfigs(state) {
+	  //TODO webpack.config.js .babelrc
+	}
+	
+	function generateApp(state) {
+	  //TODO everything in app
+	}
+	
+	function generatePublic(state) {
+	  //TODO everything in public
 	}
 
 /***/ }
