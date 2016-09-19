@@ -36995,6 +36995,7 @@
 	function generateConfigs(state) {
 	  var webpackConfigJs = 'var webpack = require(\'webpack\');\nvar path = require(\'path\');\n\nvar BUILD_DIR = path.resolve(__dirname, \'public/js\');\nvar APP_DIR = path.resolve(__dirname, \'app\');\n\nvar config = {\n  entry: APP_DIR + \'/index.jsx\',\n  output: {\n    path: BUILD_DIR,\n    filename: \'bundle.js\'\n  },\n  module : {\n    loaders : [\n      {\n        test : /.jsx?/,\n        include : APP_DIR,\n        loader : \'babel\'\n      }\n    ]\n  }\n};\n\nmodule.exports = config;\n';
 	  var babelRc = '{\n  "presets" : ["es2015", "react"]\n}\n';
+	  var gitignore = 'node_modules';
 	  fs.writeFile(state.location + '/webpack.config.js', webpackConfigJs, function (err) {
 	    if (err) {
 	      dialog.showErrorBox('Error', 'Error creating webpack.config.js\n' + JSON.stringify(err));
@@ -37003,6 +37004,11 @@
 	  fs.writeFile(state.location + '/babelrc', babelRc, function (err) {
 	    if (err) {
 	      dialog.showErrorBox('Error', 'Error creating babelrc\n' + JSON.stringify(err));
+	    }
+	  });
+	  fs.writeFile(state.location + '/.gitignore', gitignore, function (err) {
+	    if (err) {
+	      dialog.showErrorBox('Error', 'Error creating .gitignore\n' + JSON.stringify(err));
 	    }
 	  });
 	}
@@ -37023,7 +37029,42 @@
 	}
 	
 	function generatePublic(state) {
-	  //TODO everything in public
+	  fs.mkdir(state.location + '/public', function (err) {
+	    if (err) {
+	      dialog.showErrorBox('Error', 'Error creating /public\npublic folder probably already exists\n' + JSON.stringify(err));
+	    }
+	
+	    fs.mkdir(state.location + '/public/html', function (err) {
+	      if (err) {
+	        dialog.showErrorBox('Error', 'Error creating /public/html\npublic/html folder probably already exists\n' + JSON.stringify(err));
+	      }
+	
+	      var indexHtml = '<html>\n  <head>\n    <meta charset="utf-8">\n    <title></title>\n    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.0/jquery.min.js"></script>\n    <link rel="stylesheet" href="/css/stylesheet.css" media="screen" charset="utf-8">\n  </head>\n  <body>\n    <div id="app" />\n    <script src="/js/bundle.js" type="text/javascript"></script>\n  </body>\n</html>\n';
+	      fs.writeFile(state.location + '/public/html/index.html', indexHtml, function (err) {
+	        if (err) {
+	          dialog.showErrorBox('Error', 'Error creating /public/html/index.html\n' + JSON.stringify(err));
+	        }
+	      });
+	    });
+	
+	    fs.mkdir(state.location + '/public/css', function (err) {
+	      if (err) {
+	        dialog.showErrorBox('Error', 'Error creating /public/css\npublic/css folder probably already exists\n' + JSON.stringify(err));
+	      }
+	
+	      fs.writeFile(state.location + '/public/css/stylesheet.css', '', function (err) {
+	        if (err) {
+	          dialog.showErrorBox('Error', 'Error creating /public/css/stylesheet.css\n' + JSON.stringify(err));
+	        }
+	      });
+	    });
+	
+	    fs.mkdir(state.location + '/public/js', function (err) {
+	      if (err) {
+	        dialog.showErrorBox('Error', 'Error creating /public/js\npublic/js folder probably already exists\n' + JSON.stringify(err));
+	      }
+	    });
+	  });
 	}
 
 /***/ }

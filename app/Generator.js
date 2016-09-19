@@ -192,6 +192,7 @@ module.exports = config;
   "presets" : ["es2015", "react"]
 }
 `;
+  var gitignore = `node_modules`;
   fs.writeFile(state.location+'/webpack.config.js', webpackConfigJs, function(err){
     if (err){
       dialog.showErrorBox('Error', `Error creating webpack.config.js
@@ -201,6 +202,12 @@ ${JSON.stringify(err)}`);
   fs.writeFile(state.location+'/babelrc', babelRc, function(err){
     if (err){
       dialog.showErrorBox('Error', `Error creating babelrc
+${JSON.stringify(err)}`);
+    }
+  });
+  fs.writeFile(state.location+'/.gitignore', gitignore, function(err){
+    if (err){
+      dialog.showErrorBox('Error', `Error creating .gitignore
 ${JSON.stringify(err)}`);
     }
   });
@@ -260,5 +267,62 @@ ${JSON.stringify(err)}`);
 }
 
 function generatePublic(state){
-  //TODO everything in public
+  fs.mkdir(state.location+'/public', function(err){
+    if (err){
+      dialog.showErrorBox('Error', `Error creating /public
+public folder probably already exists
+${JSON.stringify(err)}`);
+    }
+
+    fs.mkdir(state.location+'/public/html', function(err){
+      if (err){
+        dialog.showErrorBox('Error', `Error creating /public/html
+public/html folder probably already exists
+${JSON.stringify(err)}`);
+      }
+
+      var indexHtml = `<html>
+  <head>
+    <meta charset="utf-8">
+    <title></title>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.0/jquery.min.js"></script>
+    <link rel="stylesheet" href="/css/stylesheet.css" media="screen" charset="utf-8">
+  </head>
+  <body>
+    <div id="app" />
+    <script src="/js/bundle.js" type="text/javascript"></script>
+  </body>
+</html>
+`;
+      fs.writeFile(state.location+'/public/html/index.html', indexHtml, function(err){
+        if (err){
+          dialog.showErrorBox('Error', `Error creating /public/html/index.html
+${JSON.stringify(err)}`);
+        }
+      });
+    });
+
+    fs.mkdir(state.location+'/public/css', function(err){
+      if (err){
+        dialog.showErrorBox('Error', `Error creating /public/css
+public/css folder probably already exists
+${JSON.stringify(err)}`);
+      }
+
+      fs.writeFile(state.location+'/public/css/stylesheet.css', '', function(err){
+        if (err){
+          dialog.showErrorBox('Error', `Error creating /public/css/stylesheet.css
+${JSON.stringify(err)}`);
+        }
+      });
+    });
+
+    fs.mkdir(state.location+'/public/js', function(err){
+      if (err){
+        dialog.showErrorBox('Error', `Error creating /public/js
+public/js folder probably already exists
+${JSON.stringify(err)}`);
+      }
+    });
+  });
 }
