@@ -2,9 +2,13 @@
   "name": "mason",
   "version": "1.0.0",
   "description": "Electron app for creating microservice stubs",
-  "main": "index.js",
+  "main": "main.js",
   "scripts": {
-    "test": "mocha"
+    "test": "mocha",
+    "start": "electron main.js",
+    "dev-start": "electron main.js -D",
+    "build": "webpack -p",
+    "watch": "webpack -d --watch"
   },
   "keywords": [
     "mason",
@@ -22,11 +26,13 @@
     "electron-prebuilt": "^1.4.0",
     "react": "^15.3.1",
     "react-dom": "^15.3.1",
+    "react-router": "^2.8.1",
     "webpack": "^1.13.2"
   },
   "devDependencies": {
     "chai": "^3.5.0",
     "electron-reload": "^1.0.2",
-    "mocha": "^3.0.2"
+    "mocha": "^3.0.2",
+    "yargs": "^5.0.0"
   }
 }
