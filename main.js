@@ -19,7 +19,7 @@ app.on('window-all-closed', function() {
   }
 });
 app.on('ready', function() {
-  win = new BrowserWindow({width: 1360, height: 800});
+  win = new BrowserWindow({width: 800, height: 600});
   win.loadURL('file://' + __dirname + '/public/html/index.html');
   win.openDevTools();
   win.on('closed', function() {

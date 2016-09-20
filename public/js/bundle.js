@@ -83,7 +83,8 @@ var App = _react2.default.createClass({
 
     return _react2.default.createElement(
       'div',
-      null,
+      {
+        className: 'content' },
       _react2.default.createElement(
         _reactRouter.IndexLink,
         {
@@ -96,7 +97,7 @@ var App = _react2.default.createClass({
       ),
       _react2.default.createElement(
         'div',
-        { className: 'content' },
+        null,
         _react2.default.Children.map(this.props.children, function (child) {
           return _react2.default.cloneElement(child, {
             data: _this.state,
@@ -129,11 +130,18 @@ var LocationElement = _react2.default.createClass({
         { to: '/server' },
         _react2.default.createElement(
           'span',
-          null,
+          {
+            className: 'btn' },
           'Next'
         )
       );
     }
+    var locationBox = this.props.data.location ? _react2.default.createElement(
+      'div',
+      {
+        className: 'display' },
+      this.props.data.location
+    ) : null;
     return _react2.default.createElement(
       'div',
       null,
@@ -142,18 +150,21 @@ var LocationElement = _react2.default.createClass({
         null,
         'Project Location'
       ),
-      _react2.default.createElement(
-        'div',
-        null,
-        this.props.data.location
-      ),
+      locationBox,
       _react2.default.createElement(
         'span',
         {
-          onClick: this.openFolder },
+          onClick: this.openFolder,
+          className: 'btn' },
         'Open Folder'
       ),
-      nextLink
+      _react2.default.createElement(
+        'div',
+        {
+          className: 'nav' },
+        _react2.default.createElement('span', null),
+        nextLink
+      )
     );
   },
   openFolder: function openFolder() {
@@ -220,21 +231,28 @@ var ServerElement = _react2.default.createClass({
           onChange: this.changePort })
       ),
       _react2.default.createElement(
-        _reactRouter.Link,
-        { to: '/' },
+        'div',
+        {
+          className: 'nav' },
         _react2.default.createElement(
-          'span',
-          null,
-          'Back'
-        )
-      ),
-      _react2.default.createElement(
-        _reactRouter.Link,
-        { to: '/database' },
+          _reactRouter.Link,
+          { to: '/' },
+          _react2.default.createElement(
+            'span',
+            {
+              className: 'btn' },
+            'Back'
+          )
+        ),
         _react2.default.createElement(
-          'span',
-          null,
-          'Next'
+          _reactRouter.Link,
+          { to: '/database' },
+          _react2.default.createElement(
+            'span',
+            {
+              className: 'btn' },
+            'Next'
+          )
         )
       )
     );
@@ -282,6 +300,7 @@ var DatabaseElement = (0, _reactRouter.withRouter)(_react2.default.createClass({
         'div',
         null,
         'Select your database',
+        _react2.default.createElement('br', null),
         _react2.default.createElement(
           'select',
           {
@@ -325,19 +344,26 @@ var DatabaseElement = (0, _reactRouter.withRouter)(_react2.default.createClass({
           onChange: this.changePath })
       ),
       _react2.default.createElement(
-        _reactRouter.Link,
-        { to: '/server' },
+        'div',
+        {
+          className: 'nav' },
+        _react2.default.createElement(
+          _reactRouter.Link,
+          { to: '/server' },
+          _react2.default.createElement(
+            'span',
+            {
+              className: 'btn' },
+            'Back'
+          )
+        ),
         _react2.default.createElement(
           'span',
-          null,
-          'Back'
+          {
+            onClick: this.generate,
+            className: 'btn' },
+          'Generate!'
         )
-      ),
-      _react2.default.createElement(
-        'span',
-        {
-          onClick: this.generate },
-        'Generate!'
       )
     );
   },
@@ -394,7 +420,7 @@ var SummaryElement = _react2.default.createClass({
           null,
           this.props.data.location
         ),
-        'to initialize additional project properties.'
+        ' to initialize additional project properties.'
       ),
       _react2.default.createElement(
         'p',

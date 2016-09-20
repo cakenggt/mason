@@ -18,14 +18,15 @@ var App = React.createClass({
   },
   render: function() {
     return (
-      <div>
+      <div
+        className="content">
         <IndexLink
           to="/">
           <h1>
             Mason
           </h1>
         </IndexLink>
-        <div className="content">
+        <div>
           {React.Children.map(this.props.children, child => {
             return React.cloneElement(child, {
               data: this.state,
@@ -54,19 +55,28 @@ var LocationElement = React.createClass({
     if (this.props.data.location){
       nextLink = (
         <Link to="/server">
-          <span>Next</span>
+          <span
+            className="btn">Next</span>
         </Link>
       );
     }
+    var locationBox = this.props.data.location ?
+    <div
+      className="display">
+      {this.props.data.location}
+    </div> : null;
     return (
       <div>
         <h2>Project Location</h2>
-        <div>
-          {this.props.data.location}
-        </div>
+        {locationBox}
         <span
-          onClick={this.openFolder}>Open Folder</span>
-        {nextLink}
+          onClick={this.openFolder}
+          className="btn">Open Folder</span>
+        <div
+          className="nav">
+          <span></span>
+          {nextLink}
+        </div>
       </div>
     )
   },
@@ -110,12 +120,17 @@ var ServerElement = React.createClass({
             value={this.props.data.port}
             onChange={this.changePort}/>
         </div>
-        <Link to="/">
-          <span>Back</span>
-        </Link>
-        <Link to="/database">
-          <span>Next</span>
-        </Link>
+        <div
+          className="nav">
+          <Link to="/">
+            <span
+              className="btn">Back</span>
+          </Link>
+          <Link to="/database">
+            <span
+              className="btn">Next</span>
+          </Link>
+        </div>
       </div>
     )
   },
@@ -155,7 +170,7 @@ var DatabaseElement = withRouter(React.createClass({
       <div>
         <h2>Database</h2>
         <div>
-          Select your database
+          Select your database<br/>
           <select
             onChange={this.selectDb}
             value={this.props.data.db}>
@@ -179,11 +194,16 @@ var DatabaseElement = withRouter(React.createClass({
             value={this.props.data.dbPath}
             onChange={this.changePath}/>
         </div>
-        <Link to="/server">
-          <span>Back</span>
-        </Link>
-        <span
-          onClick={this.generate}>Generate!</span>
+        <div
+          className="nav">
+          <Link to="/server">
+            <span
+              className="btn">Back</span>
+          </Link>
+          <span
+            onClick={this.generate}
+            className="btn">Generate!</span>
+        </div>
       </div>
     )
   },
@@ -213,8 +233,8 @@ var SummaryElement = React.createClass({
         </p>
         <h2>Next Steps</h2>
         <p>
-          Run <code>npm init</code> in <code>{this.props.data.location}</code>
-        to initialize additional project properties.
+          Run <code>npm init</code> in <code>{this.props.data.location}</code> to
+          initialize additional project properties.
         </p>
         <p>
           Run <code>npm install</code> to install all dependencies.

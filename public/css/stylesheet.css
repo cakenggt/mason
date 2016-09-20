@@ -1,0 +1,66 @@
+@font-face {
+  font-family: 'Ewert';
+  src: url('Ewert-Regular.ttf')  format('truetype'); /* Legacy iOS */
+}
+body {
+  background-color: #252525;
+  color: #D7CCC8;
+}
+a {
+  text-decoration: none;
+  color: #D7CCC8;
+}
+select, input, .display {
+  border: 1px solid #000;
+  font-size: 14px;
+  color: #fff;
+  background: #444;
+  padding: 5px;
+  margin: 3px;
+  border-radius: 3px;
+  box-shadow: inset 0 1px 2px rgba(0,0,0,.39);
+}
+.display {
+  margin: 10px 0px;
+}
+.content {
+  max-width: 600px;
+  margin: 10px auto;
+  text-align: center;
+}
+.btn {
+  border-radius: 6px;
+  padding: 3px;
+  background-color: #f5f5f5;
+  color: #050505;
+  cursor: pointer;
+  -webkit-touch-callout: none; /* iOS Safari */
+  -webkit-user-select: none;   /* Chrome/Safari/Opera */
+  -khtml-user-select: none;    /* Konqueror */
+  -moz-user-select: none;      /* Firefox */
+  -ms-user-select: none;       /* Internet Explorer/Edge */
+  user-select: none;           /* Non-prefixed version, currently
+                                  not supported by any browser */
+}
+.btn:active {
+  background-color: #a5a5a5;
+}
+.nav {
+  display: flex;
+  justify-content: space-between;
+  padding: 5px 0px;
+  margin: 5px 0px;
+}
+h1 {
+  font-family: 'Ewert', cursive;
+  font-size: 400%;
+  font-weight: normal;
+}
+code {
+  background-color: black;
+  padding: 4px;
+  border-radius: 3px;
+}
+p {
+  line-height: 1.4em;
+}
