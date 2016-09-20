@@ -1,0 +1,14 @@
+module.exports = function(options){
+  return `<html>
+  <head>
+    <meta charset="utf-8">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.0/jquery.min.js"></script>
+    <link rel="stylesheet" href="/css/stylesheet.css" media="screen" charset="utf-8">
+  </head>
+  <body>
+    <div id="app" />
+    <script src="/js/bundle.js" type="text/javascript"></script>
+  </body>
+</html>
+`;
+};

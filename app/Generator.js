@@ -16,90 +16,34 @@ function generatePackage(state){
   var db = '';
   switch(state.db){
     case 'PostgreSQL':
-      db = `"pg": "^6.1.0",`;
+      db = `"pg": "^6.1.0"`;
       break;
     case 'SQLite':
-      db = `"sqlite": "^2.2.0",`;
+      db = `"sqlite": "^2.2.0"`;
       break;
   }
 
-  var packageJson = `{
-  "dependencies": {
-    "babel-loader": "^6.2.5",
-    "babel-polyfill": "^6.13.0",
-    "babel-preset-es2015": "^6.13.2",
-    "babel-preset-react": "^6.11.1",
-    "body-parser": "^1.15.2",
-    "express": "^4.14.0",
-    "react": "^15.3.1",
-    "react-dom": "^15.3.1",
-    "react-router": "^2.7.0",
-    "sequelize": "^3.24.1",
-    "webpack": "^1.13.2",
-    ${db}
-  }
-}`;
-  fs.writeFile(state.location+'/package.json', packageJson, function(err){
-    if (err){
-      dialog.showErrorBox('Error', `Error creating package.json
-${JSON.stringify(err)}`);
-    }
-  });
+  writeFile(
+    state.location+'/package.json',
+    require('../templates/package.json.js')({
+      db: db
+    })
+  );
 }
 
 function generateModels(state){
-  var modelsJs = `module.exports = function(sequelize, DataTypes) {
-
-  /**
-   * All of your model definitions go here.
-   * Return an object where each key is a model
-   * name and the value is the result of sequelize.define
-   * Don't forget to use the provided DataTypes object to define
-   * your column data types
-   */
-
-};`;
-  fs.writeFile(state.location+'/models.js', modelsJs, function(err){
-    if (err){
-      dialog.showErrorBox('Error', `Error creating models.js
-${JSON.stringify(err)}`);
-    }
-  });
+  writeFile(
+    state.location+'/models.js',
+    require('../templates/models.js.js')()
+  );
 }
 
 function generateApi(state){
-  fs.mkdir(state.location+'/api', function(err){
-    if (err){
-      dialog.showErrorBox('Error', `Error creating /api
-api folder probably already exists
-${JSON.stringify(err)}`);
-    }
-
-    var v1 = `'use strict';
-const prefix = '/api/v1/';
-
-module.exports = function(options){
-
-  //This is your express app object
-  let app = options.app;
-  //This is the map of all of your sequelize models
-  let models = options.models;
-
-  /**
-   * All of your api routes go here.
-   * Format them in the following way:
-   * app.post(prefix+'endpoint', callback);
-   * app.get(prefix+'endpoint', callback);
-   */
-
-};`;
-    fs.writeFile(state.location+'/api/v1.js', v1, function(err){
-      if (err){
-        dialog.showErrorBox('Error', `Error creating /api/v1.js
-api folder probably doesn't exist
-${JSON.stringify(err)}`);
-      }
-    });
+  mkDir(state.location+'/api', function(err){
+    writeFile(
+      state.location+'/api/v1.js',
+      require('../templates/v1.js.js')()
+    );
   });
 }
 
@@ -108,221 +52,82 @@ function generateIndexJs(state){
   'process.env.'+state.dbPath : `"${state.dbPath}"`;
   var port = state.portType === 'ENV' ?
   'process.env.'+state.port : `${state.port}`;
-  var indexJs = `'use strict';
-
-const express = require('express');
-const app = express();
-const bodyParser = require('body-parser');
-const http = require('http').Server(app);
-const Sequelize = require('sequelize');
-const db = new Sequelize(${dbPath}, {
-  logging: false
-});
-
-//sync all sequelize models
-db.sync();
-
-const models = db.import(__dirname + '/models');
-
-//parse application/json
-app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: false }));
-
-//Deliver the public folder statically
-app.use(express.static('public'));
-
-//This tells the server to listen
-http.listen(${port}, function(){
-  console.log('Example app listening on port', credentials.PORT, '!');
-});
-
-//This is the options object that will be passed to the api files
-let apiOptions = {
-  app: app,
-  models: models
-};
-
-//Load the api versions
-require('./api/v1')(apiOptions);
-
-/*
- * This tells the server to always serve index.html no matter what,
- * excluding the previously defined api routes. This is so we can use
- * react-router's browserHistory feature.
- */
-app.get('*', function(req, res){
-  res.sendFile(__dirname+'/public/html/index.html');
-});
-`;
-  fs.writeFile(state.location+'/index.js', indexJs, function(err){
-    if (err){
-      dialog.showErrorBox('Error', `Error creating index.js
-${JSON.stringify(err)}`);
-    }
-  });
+  writeFile(
+    state.location+'/index.js',
+    require('../templates/index.js.js')({
+      dbPath: dbPath,
+      port: port
+    })
+  );
 }
 
 function generateConfigs(state){
-  var webpackConfigJs = `var webpack = require('webpack');
-var path = require('path');
-
-var BUILD_DIR = path.resolve(__dirname, 'public/js');
-var APP_DIR = path.resolve(__dirname, 'app');
-
-var config = {
-  entry: APP_DIR + '/index.jsx',
-  output: {
-    path: BUILD_DIR,
-    filename: 'bundle.js'
-  },
-  module : {
-    loaders : [
-      {
-        test : /\.jsx?/,
-        include : APP_DIR,
-        loader : 'babel'
-      }
-    ]
-  }
-};
-
-module.exports = config;
-`;
-  var babelRc = `{
-  "presets" : ["es2015", "react"]
-}
-`;
-  var gitignore = `node_modules`;
-  fs.writeFile(state.location+'/webpack.config.js', webpackConfigJs, function(err){
-    if (err){
-      dialog.showErrorBox('Error', `Error creating webpack.config.js
-${JSON.stringify(err)}`);
-    }
-  });
-  fs.writeFile(state.location+'/babelrc', babelRc, function(err){
-    if (err){
-      dialog.showErrorBox('Error', `Error creating babelrc
-${JSON.stringify(err)}`);
-    }
-  });
-  fs.writeFile(state.location+'/.gitignore', gitignore, function(err){
-    if (err){
-      dialog.showErrorBox('Error', `Error creating .gitignore
-${JSON.stringify(err)}`);
-    }
-  });
+  writeFile(
+    state.location+'/webpack.config.js',
+    require('../templates/webpack.config.js.js')()
+  );
+  writeFile(
+    state.location+'/.babelrc',
+    require('../templates/babelrc.js')()
+  );
+  writeFile(
+    state.location+'/.gitignore',
+    require('../templates/gitignore.js')()
+  );
 }
 
 function generateApp(state){
-  fs.mkdir(state.location+'/app', function(err){
-    if (err){
-      dialog.showErrorBox('Error', `Error creating /app
-app folder probably already exists
-${JSON.stringify(err)}`);
-    }
-
-    var indexJsx = `import 'babel-polyfill';
-import React from 'react';
-import {Router, Route, IndexRoute, browserHistory} from 'react-router';
-import {render} from 'react-dom';
-
-var App = React.createClass({
-  render: function() {
-    return (
-      <div className="content">
-        {React.Children.map(this.props.children, child => {
-          return React.cloneElement(child, {
-            data: this.state
-          });
-        })}
-      </div>
+  mkDir(state.location+'/app', function(err){
+    writeFile(
+      state.location+'/app/index.jsx',
+      require('../templates/index.jsx.js')()
     );
-  }
-});
-
-var Index = React.createClass({
-  render: function() {
-    return (
-      <div></div>
-    );
-  }
-});
-
-render(
-  <Router history={browserHistory}>
-    <Route path="/" component={App}>
-      <IndexRoute component={Index}/>
-    </Route>
-  </Router>,
-  document.getElementById('app')
-);
-`;
-    fs.writeFile(state.location+'/app/index.jsx', indexJsx, function(err){
-      if (err){
-        dialog.showErrorBox('Error', `Error creating /app/index.jsx
-${JSON.stringify(err)}`);
-      }
-    });
   });
 }
 
 function generatePublic(state){
-  fs.mkdir(state.location+'/public', function(err){
+  mkDir(state.location+'/public', function(err){
+
+    mkDir(state.location+'/public/html', function(err){
+      writeFile(
+        state.location+'/public/html/index.html',
+        require('../templates/index.html.js')()
+      );
+    });
+
+    mkDir(state.location+'/public/css', function(err){
+
+      writeFile(
+        state.location+'/public/css/stylesheet.css',
+        require('../templates/stylesheet.css.js')()
+      );
+    });
+
+    mkDir(state.location+'/public/js');
+  });
+}
+
+function mkDir(path, callback){
+  fs.mkdir(path, function(err){
     if (err){
-      dialog.showErrorBox('Error', `Error creating /public
-public folder probably already exists
+      dialog.showErrorBox('Error', `Error creating ${path}
+Folder probably already exists
 ${JSON.stringify(err)}`);
     }
+    if (callback){
+      callback(err);
+    }
+  });
+}
 
-    fs.mkdir(state.location+'/public/html', function(err){
-      if (err){
-        dialog.showErrorBox('Error', `Error creating /public/html
-public/html folder probably already exists
+function writeFile(path, file, callback){
+  fs.writeFile(path, file, function(err){
+    if (err){
+      dialog.showErrorBox('Error', `Error creating ${path}
 ${JSON.stringify(err)}`);
-      }
-
-      var indexHtml = `<html>
-  <head>
-    <meta charset="utf-8">
-    <title></title>
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.0/jquery.min.js"></script>
-    <link rel="stylesheet" href="/css/stylesheet.css" media="screen" charset="utf-8">
-  </head>
-  <body>
-    <div id="app" />
-    <script src="/js/bundle.js" type="text/javascript"></script>
-  </body>
-</html>
-`;
-      fs.writeFile(state.location+'/public/html/index.html', indexHtml, function(err){
-        if (err){
-          dialog.showErrorBox('Error', `Error creating /public/html/index.html
-${JSON.stringify(err)}`);
-        }
-      });
-    });
-
-    fs.mkdir(state.location+'/public/css', function(err){
-      if (err){
-        dialog.showErrorBox('Error', `Error creating /public/css
-public/css folder probably already exists
-${JSON.stringify(err)}`);
-      }
-
-      fs.writeFile(state.location+'/public/css/stylesheet.css', '', function(err){
-        if (err){
-          dialog.showErrorBox('Error', `Error creating /public/css/stylesheet.css
-${JSON.stringify(err)}`);
-        }
-      });
-    });
-
-    fs.mkdir(state.location+'/public/js', function(err){
-      if (err){
-        dialog.showErrorBox('Error', `Error creating /public/js
-public/js folder probably already exists
-${JSON.stringify(err)}`);
-      }
-    });
+    }
+    if (callback){
+      callback(err);
+    }
   });
 }
