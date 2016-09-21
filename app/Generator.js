@@ -1,6 +1,6 @@
 var fs = window.require('fs');
 var dialog = window.require('electron').remote.dialog;
-var Mustache = require('mustache');
+var Handlebars = require('handlebars');
 
 export var generate = function(state){
   console.log('generating stubs with state', state);
@@ -16,121 +16,121 @@ export var generate = function(state){
 function generatePackage(state){
   var db = '';
   if (state.dbExists){
-    db += `\n\t\t"sequelize": "^3.24.1",`;
     switch(state.db){
       case 'PostgreSQL':
-        db += `\n\t\t"pg": "^6.1.0",`;
+        db = `"pg": "^6.1.0",`;
         break;
       case 'SQLite':
-        db += `\n\t\t"sqlite": "^2.2.0",`;
+        db = `"sqlite": "^2.2.0",`;
         break;
     }
   }
 
-  writeFile(
-    state.location+'/package.json',
-    require('../templates/package.json.js')({
-      db: db
-    })
-  );
+  readFile('templates/package.json', function(err, data){
+    writeFile(
+      state.location+'/package.json',
+      Handlebars.compile(data)({
+        state: state,
+        db: db
+      })
+    );
+  });
 }
 
 function generateModels(state){
   if (state.dbExists){
-    writeFile(
-      state.location+'/models.js',
-      require('../templates/models.js.js')()
-    );
+    readFile('templates/models.js', function(err, data){
+      writeFile(
+        state.location+'/models.js',
+        Handlebars.compile(data)()
+      );
+    });
   }
 }
 
 function generateApi(state){
   if (state.apiExists){
     mkDir(state.location+'/api', function(err){
-      var models = state.dbExists ?
-      `\n\t//This is the map of all of your sequelize models\n`+
-      `\tlet models = options.models;` : '';
-      writeFile(
-        state.location+'/api/v1.js',
-        require('../templates/v1.js.js')({
-          models: models
-        })
-      );
+      readFile('templates/v1.js', function(err, data){
+        writeFile(
+          state.location+'/api/v1.js',
+          Handlebars.compile(data)({
+            state: state
+          })
+        );
+      });
     });
   }
 }
 
 function generateIndexJs(state){
-  var dbPath = state.dbUrlType === 'ENV' ?
+  var db = state.dbUrlType === 'ENV' ?
   'process.env.'+state.dbPath : `"${state.dbPath}"`;
-  var db = state.dbExists ?
-    `\nconst Sequelize = require('sequelize');\n`+
-    `const db = new Sequelize(${dbPath}, {\n`+
-    `\tlogging: false\n});\n\n`+
-    `//sync all sequelize models\ndb.sync();\n` : '';
   var port = state.portType === 'ENV' ?
     'process.env.'+state.port : `${state.port}`;
-  var models = state.dbExists ?
-    `\nconst models = db.import(__dirname + '/models');\n` : '';
-  var modelsOption = state.dbExists ?
-    `,\n\tmodels: models` : '';
-  var api = state.apiExists ?
-    `\n\n//This is the options object that will be passed to the api files\n`+
-    `let apiOptions = {\n\tapp: app${modelsOption}\n};\n\n`+
-    `//Load the api versions\nrequire('./api/v1')(apiOptions);` : '';
-  writeFile(
-    state.location+'/index.js',
-    require('../templates/index.js.js')({
-      db: db,
-      port: port,
-      models: models,
-      api: api
-    })
-  );
+
+  readFile('templates/index.js', function(err, data){
+    writeFile(
+      state.location+'/index.js',
+      Handlebars.compile(data)({
+        db: db,
+        port: port,
+        state: state
+      })
+    );
+  });
 }
 
 function generateConfigs(state){
-  writeFile(
-    state.location+'/webpack.config.js',
-    require('../templates/webpack.config.js.js')()
-  );
-  writeFile(
-    state.location+'/.babelrc',
-    require('../templates/babelrc.js')()
-  );
-  writeFile(
-    state.location+'/.gitignore',
-    require('../templates/gitignore.js')()
-  );
+  readFile('templates/webpack.config.js', function(err, data){
+    writeFile(
+      state.location+'/webpack.config.js',
+      Handlebars.compile(data)()
+    );
+  });
+  readFile('templates/.babelrc', function(err, data){
+    writeFile(
+      state.location+'/.babelrc',
+      Handlebars.compile(data)()
+    );
+  });
+  readFile('templates/.gitignore', function(err, data){
+    writeFile(
+      state.location+'/.gitignore',
+      Handlebars.compile(data)()
+    );
+  });
 }
 
 function generateApp(state){
   mkDir(state.location+'/app', function(err){
-    writeFile(
-      state.location+'/app/index.jsx',
-      require('../templates/index.jsx.js')()
-    );
+    readFile('templates/index.jsx', function(err, data){
+      writeFile(
+        state.location+'/app/index.jsx',
+        Handlebars.compile(data)()
+      );
+    });
   });
 }
 
 function generatePublic(state){
   mkDir(state.location+'/public', function(err){
-
     mkDir(state.location+'/public/html', function(err){
-      writeFile(
-        state.location+'/public/html/index.html',
-        require('../templates/index.html.js')()
-      );
+      readFile('templates/index.html', function(err, data){
+        writeFile(
+          state.location+'/public/html/index.html',
+          Handlebars.compile(data)()
+        );
+      });
     });
-
     mkDir(state.location+'/public/css', function(err){
-
-      writeFile(
-        state.location+'/public/css/stylesheet.css',
-        require('../templates/stylesheet.css.js')()
-      );
+      readFile('templates/stylesheet.css', function(err, data){
+        writeFile(
+          state.location+'/public/css/stylesheet.css',
+          Handlebars.compile(data)()
+        );
+      });
     });
-
     mkDir(state.location+'/public/js');
   });
 }

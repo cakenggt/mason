@@ -1,5 +1,4 @@
-module.exports = function(options){
-  return `var webpack = require('webpack');
+var webpack = require('webpack');
 var path = require('path');
 
 var BUILD_DIR = path.resolve(__dirname, 'public/js');
@@ -26,5 +25,3 @@ var config = {
 };
 
 module.exports = config;
-`;
-};

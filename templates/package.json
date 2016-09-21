@@ -1,5 +1,4 @@
-module.exports = function(options){
-  return `{
+{
   "main": "index.js",
   "scripts": {
     "start": "webpack -p && node index.js",
@@ -15,8 +14,11 @@ module.exports = function(options){
     "express": "^4.14.0",
     "react": "^15.3.1",
     "react-dom": "^15.3.1",
-    "react-router": "^2.7.0",${options.db}
+    "react-router": "^2.7.0",
+    {{#if state.dbExists}}
+    "sequelize": "^3.24.1",
+    {{{db}}}
+    {{/if}}
     "webpack": "^1.13.2"
   }
-}`;
-};
+}

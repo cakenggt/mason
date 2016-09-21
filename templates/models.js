@@ -1,5 +1,4 @@
-module.exports = function(options){
-  return `module.exports = function(sequelize, DataTypes) {
+module.exports = function(sequelize, DataTypes) {
 
   /**
    * All of your model definitions go here.
@@ -9,5 +8,4 @@ module.exports = function(options){
    * your column data types
    */
 
-};`;
 };
