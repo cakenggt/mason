@@ -20,9 +20,11 @@ const models = db.import(__dirname + '/models');
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 
+{{#if state.frontEndExists}}
 //Deliver the public folder statically
 app.use(express.static('public'));
 
+{{/if}}
 //This tells the server to listen
 var port = {{{port}}};
 http.listen(port, function(){
@@ -39,6 +41,7 @@ let apiOptions = {
 //Load the api versions
 require('./api/v1')(apiOptions);
 {{/if}}
+{{#if state.frontEndExists}}
 
 /*
 * This tells the server to always serve index.html no matter what,
@@ -48,3 +51,4 @@ require('./api/v1')(apiOptions);
 app.get('*', function(req, res){
   res.sendFile(__dirname+'/public/html/index.html');
 });
+{{/if}}

@@ -82,18 +82,20 @@ function generateIndexJs(state){
 }
 
 function generateConfigs(state){
-  readFile('templates/webpack.config.js', function(err, data){
-    writeFile(
-      state.location+'/webpack.config.js',
-      Handlebars.compile(data)()
-    );
-  });
-  readFile('templates/.babelrc', function(err, data){
-    writeFile(
-      state.location+'/.babelrc',
-      Handlebars.compile(data)()
-    );
-  });
+  if (state.frontEndExists){
+    readFile('templates/webpack.config.js', function(err, data){
+      writeFile(
+        state.location+'/webpack.config.js',
+        Handlebars.compile(data)()
+      );
+    });
+    readFile('templates/.babelrc', function(err, data){
+      writeFile(
+        state.location+'/.babelrc',
+        Handlebars.compile(data)()
+      );
+    });
+  }
   readFile('templates/.gitignore', function(err, data){
     writeFile(
       state.location+'/.gitignore',
@@ -103,36 +105,40 @@ function generateConfigs(state){
 }
 
 function generateApp(state){
-  mkDir(state.location+'/app', function(err){
-    readFile('templates/index.jsx', function(err, data){
-      writeFile(
-        state.location+'/app/index.jsx',
-        Handlebars.compile(data)()
-      );
+  if (state.frontEndExists){
+    mkDir(state.location+'/app', function(err){
+      readFile('templates/index.jsx', function(err, data){
+        writeFile(
+          state.location+'/app/index.jsx',
+          Handlebars.compile(data)()
+        );
+      });
     });
-  });
+  }
 }
 
 function generatePublic(state){
-  mkDir(state.location+'/public', function(err){
-    mkDir(state.location+'/public/html', function(err){
-      readFile('templates/index.html', function(err, data){
-        writeFile(
-          state.location+'/public/html/index.html',
-          Handlebars.compile(data)()
-        );
+  if (state.frontEndExists){
+    mkDir(state.location+'/public', function(err){
+      mkDir(state.location+'/public/html', function(err){
+        readFile('templates/index.html', function(err, data){
+          writeFile(
+            state.location+'/public/html/index.html',
+            Handlebars.compile(data)()
+          );
+        });
       });
-    });
-    mkDir(state.location+'/public/css', function(err){
-      readFile('templates/stylesheet.css', function(err, data){
-        writeFile(
-          state.location+'/public/css/stylesheet.css',
-          Handlebars.compile(data)()
-        );
+      mkDir(state.location+'/public/css', function(err){
+        readFile('templates/stylesheet.css', function(err, data){
+          writeFile(
+            state.location+'/public/css/stylesheet.css',
+            Handlebars.compile(data)()
+          );
+        });
       });
+      mkDir(state.location+'/public/js');
     });
-    mkDir(state.location+'/public/js');
-  });
+  }
 }
 
 function mkDir(path, callback){

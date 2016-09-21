@@ -76,8 +76,9 @@ var App = _react2.default.createClass({
       dbPath: 'DATABASE_URL',
       portType: 'ENV',
       port: 'PORT',
-      dbExists: false,
-      apiExists: true
+      dbExists: true,
+      apiExists: true,
+      frontEndExists: true
     };
   },
   render: function render() {
@@ -129,7 +130,7 @@ var LocationElement = _react2.default.createClass({
     if (this.props.data.location) {
       nextLink = _react2.default.createElement(
         _reactRouter.Link,
-        { to: '/server' },
+        { to: '/database' },
         _react2.default.createElement(
           'span',
           {
@@ -278,7 +279,7 @@ var ServerElement = _react2.default.createClass({
           className: 'nav' },
         _react2.default.createElement(
           _reactRouter.Link,
-          { to: '/' },
+          { to: '/database' },
           _react2.default.createElement(
             'span',
             {
@@ -288,7 +289,7 @@ var ServerElement = _react2.default.createClass({
         ),
         _react2.default.createElement(
           _reactRouter.Link,
-          { to: '/database' },
+          { to: '/display' },
           _react2.default.createElement(
             'span',
             {
@@ -313,14 +314,11 @@ var ServerElement = _react2.default.createClass({
   }
 });
 
-var DatabaseElement = (0, _reactRouter.withRouter)(_react2.default.createClass({
+var DatabaseElement = _react2.default.createClass({
   displayName: 'DatabaseElement',
 
   propTypes: {
-    setMainState: _react2.default.PropTypes.func,
-    router: _react2.default.PropTypes.shape({
-      push: _react2.default.PropTypes.func.isRequired
-    }).isRequired
+    setMainState: _react2.default.PropTypes.func
   },
   render: function render() {
     var databases = ['PostgreSQL', 'SQLite'];
@@ -447,7 +445,7 @@ var DatabaseElement = (0, _reactRouter.withRouter)(_react2.default.createClass({
           className: 'nav' },
         _react2.default.createElement(
           _reactRouter.Link,
-          { to: '/server' },
+          { to: '/' },
           _react2.default.createElement(
             'span',
             {
@@ -456,11 +454,14 @@ var DatabaseElement = (0, _reactRouter.withRouter)(_react2.default.createClass({
           )
         ),
         _react2.default.createElement(
-          'span',
-          {
-            onClick: this.generate,
-            className: 'btn fright' },
-          'Generate!'
+          _reactRouter.Link,
+          { to: '/server' },
+          _react2.default.createElement(
+            'span',
+            {
+              className: 'btn fright' },
+            'Next'
+          )
         )
       )
     );
@@ -476,12 +477,8 @@ var DatabaseElement = (0, _reactRouter.withRouter)(_react2.default.createClass({
   },
   changeDbExists: function changeDbExists(e) {
     this.props.setMainState({ dbExists: e.target.checked });
-  },
-  generate: function generate() {
-    this.props.generate();
-    this.props.router.push('/summary');
   }
-}));
+});
 
 var SummaryElement = _react2.default.createClass({
   displayName: 'SummaryElement',
@@ -549,6 +546,77 @@ var SummaryElement = _react2.default.createClass({
   }
 });
 
+var DisplayElement = (0, _reactRouter.withRouter)(_react2.default.createClass({
+  displayName: 'DisplayElement',
+
+  propTypes: {
+    setMainState: _react2.default.PropTypes.func,
+    router: _react2.default.PropTypes.shape({
+      push: _react2.default.PropTypes.func.isRequired
+    }).isRequired
+  },
+  render: function render() {
+    return _react2.default.createElement(
+      'div',
+      null,
+      _react2.default.createElement(
+        'h2',
+        null,
+        'Display'
+      ),
+      _react2.default.createElement(
+        'div',
+        {
+          className: 'option-row' },
+        _react2.default.createElement(
+          'span',
+          {
+            className: 'label' },
+          'Has front-end?'
+        ),
+        _react2.default.createElement(
+          'label',
+          { className: 'switch fright' },
+          _react2.default.createElement('input', {
+            type: 'checkbox',
+            checked: this.props.data.frontEndExists,
+            onChange: this.changeFrontEndExists }),
+          _react2.default.createElement('div', { className: 'slider round' })
+        )
+      ),
+      _react2.default.createElement(
+        'div',
+        {
+          className: 'nav' },
+        _react2.default.createElement(
+          _reactRouter.Link,
+          { to: '/server' },
+          _react2.default.createElement(
+            'span',
+            {
+              className: 'btn fleft' },
+            'Back'
+          )
+        ),
+        _react2.default.createElement(
+          'span',
+          {
+            onClick: this.generate,
+            className: 'btn fright' },
+          'Generate!'
+        )
+      )
+    );
+  },
+  changeFrontEndExists: function changeFrontEndExists(e) {
+    this.props.setMainState({ frontEndExists: e.target.checked });
+  },
+  generate: function generate() {
+    this.props.generate();
+    this.props.router.push('/summary');
+  }
+}));
+
 (0, _reactDom.render)(_react2.default.createElement(
   _reactRouter.Router,
   { history: _reactRouter.hashHistory },
@@ -556,8 +624,9 @@ var SummaryElement = _react2.default.createClass({
     _reactRouter.Route,
     { path: '/', component: App },
     _react2.default.createElement(_reactRouter.IndexRoute, { component: LocationElement }),
-    _react2.default.createElement(_reactRouter.Route, { path: 'server', component: ServerElement }),
     _react2.default.createElement(_reactRouter.Route, { path: 'database', component: DatabaseElement }),
+    _react2.default.createElement(_reactRouter.Route, { path: 'server', component: ServerElement }),
+    _react2.default.createElement(_reactRouter.Route, { path: 'display', component: DisplayElement }),
     _react2.default.createElement(_reactRouter.Route, { path: 'summary', component: SummaryElement })
   )
 ), document.getElementById('app'));
@@ -37132,7 +37201,7 @@ Object.defineProperty(exports, "__esModule", {
 });
 var fs = window.require('fs');
 var dialog = window.require('electron').remote.dialog;
-var Handlebars = __webpack_require__(/*! handlebars */ 543);
+var Handlebars = __webpack_require__(/*! handlebars */ 532);
 
 var generate = exports.generate = function generate(state) {
   console.log('generating stubs with state', state);
@@ -37200,39 +37269,45 @@ function generateIndexJs(state) {
 }
 
 function generateConfigs(state) {
-  readFile('templates/webpack.config.js', function (err, data) {
-    writeFile(state.location + '/webpack.config.js', Handlebars.compile(data)());
-  });
-  readFile('templates/.babelrc', function (err, data) {
-    writeFile(state.location + '/.babelrc', Handlebars.compile(data)());
-  });
+  if (state.frontEndExists) {
+    readFile('templates/webpack.config.js', function (err, data) {
+      writeFile(state.location + '/webpack.config.js', Handlebars.compile(data)());
+    });
+    readFile('templates/.babelrc', function (err, data) {
+      writeFile(state.location + '/.babelrc', Handlebars.compile(data)());
+    });
+  }
   readFile('templates/.gitignore', function (err, data) {
     writeFile(state.location + '/.gitignore', Handlebars.compile(data)());
   });
 }
 
 function generateApp(state) {
-  mkDir(state.location + '/app', function (err) {
-    readFile('templates/index.jsx', function (err, data) {
-      writeFile(state.location + '/app/index.jsx', Handlebars.compile(data)());
+  if (state.frontEndExists) {
+    mkDir(state.location + '/app', function (err) {
+      readFile('templates/index.jsx', function (err, data) {
+        writeFile(state.location + '/app/index.jsx', Handlebars.compile(data)());
+      });
     });
-  });
+  }
 }
 
 function generatePublic(state) {
-  mkDir(state.location + '/public', function (err) {
-    mkDir(state.location + '/public/html', function (err) {
-      readFile('templates/index.html', function (err, data) {
-        writeFile(state.location + '/public/html/index.html', Handlebars.compile(data)());
+  if (state.frontEndExists) {
+    mkDir(state.location + '/public', function (err) {
+      mkDir(state.location + '/public/html', function (err) {
+        readFile('templates/index.html', function (err, data) {
+          writeFile(state.location + '/public/html/index.html', Handlebars.compile(data)());
+        });
       });
-    });
-    mkDir(state.location + '/public/css', function (err) {
-      readFile('templates/stylesheet.css', function (err, data) {
-        writeFile(state.location + '/public/css/stylesheet.css', Handlebars.compile(data)());
+      mkDir(state.location + '/public/css', function (err) {
+        readFile('templates/stylesheet.css', function (err, data) {
+          writeFile(state.location + '/public/css/stylesheet.css', Handlebars.compile(data)());
+        });
       });
+      mkDir(state.location + '/public/js');
     });
-    mkDir(state.location + '/public/js');
-  });
+  }
 }
 
 function mkDir(path, callback) {
@@ -37269,18 +37344,7 @@ function readFile(path, callback) {
 }
 
 /***/ },
-/* 532 */,
-/* 533 */,
-/* 534 */,
-/* 535 */,
-/* 536 */,
-/* 537 */,
-/* 538 */,
-/* 539 */,
-/* 540 */,
-/* 541 */,
-/* 542 */,
-/* 543 */
+/* 532 */
 /*!***********************************!*\
   !*** ./~/handlebars/lib/index.js ***!
   \***********************************/
@@ -37292,9 +37356,9 @@ function readFile(path, callback) {
 
 // var local = handlebars.create();
 
-var handlebars = __webpack_require__(/*! ../dist/cjs/handlebars */ 544)['default'];
+var handlebars = __webpack_require__(/*! ../dist/cjs/handlebars */ 533)['default'];
 
-var printer = __webpack_require__(/*! ../dist/cjs/handlebars/compiler/printer */ 572);
+var printer = __webpack_require__(/*! ../dist/cjs/handlebars/compiler/printer */ 561);
 handlebars.PrintVisitor = printer.PrintVisitor;
 handlebars.print = printer.print;
 
@@ -37314,7 +37378,7 @@ if ("function" !== 'undefined' && (void 0)) {
 
 
 /***/ },
-/* 544 */
+/* 533 */
 /*!*********************************************!*\
   !*** ./~/handlebars/dist/cjs/handlebars.js ***!
   \*********************************************/
@@ -37327,29 +37391,29 @@ exports.__esModule = true;
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
 
-var _handlebarsRuntime = __webpack_require__(/*! ./handlebars.runtime */ 545);
+var _handlebarsRuntime = __webpack_require__(/*! ./handlebars.runtime */ 534);
 
 var _handlebarsRuntime2 = _interopRequireDefault(_handlebarsRuntime);
 
 // Compiler imports
 
-var _handlebarsCompilerAst = __webpack_require__(/*! ./handlebars/compiler/ast */ 563);
+var _handlebarsCompilerAst = __webpack_require__(/*! ./handlebars/compiler/ast */ 552);
 
 var _handlebarsCompilerAst2 = _interopRequireDefault(_handlebarsCompilerAst);
 
-var _handlebarsCompilerBase = __webpack_require__(/*! ./handlebars/compiler/base */ 564);
+var _handlebarsCompilerBase = __webpack_require__(/*! ./handlebars/compiler/base */ 553);
 
-var _handlebarsCompilerCompiler = __webpack_require__(/*! ./handlebars/compiler/compiler */ 569);
+var _handlebarsCompilerCompiler = __webpack_require__(/*! ./handlebars/compiler/compiler */ 558);
 
-var _handlebarsCompilerJavascriptCompiler = __webpack_require__(/*! ./handlebars/compiler/javascript-compiler */ 570);
+var _handlebarsCompilerJavascriptCompiler = __webpack_require__(/*! ./handlebars/compiler/javascript-compiler */ 559);
 
 var _handlebarsCompilerJavascriptCompiler2 = _interopRequireDefault(_handlebarsCompilerJavascriptCompiler);
 
-var _handlebarsCompilerVisitor = __webpack_require__(/*! ./handlebars/compiler/visitor */ 567);
+var _handlebarsCompilerVisitor = __webpack_require__(/*! ./handlebars/compiler/visitor */ 556);
 
 var _handlebarsCompilerVisitor2 = _interopRequireDefault(_handlebarsCompilerVisitor);
 
-var _handlebarsNoConflict = __webpack_require__(/*! ./handlebars/no-conflict */ 562);
+var _handlebarsNoConflict = __webpack_require__(/*! ./handlebars/no-conflict */ 551);
 
 var _handlebarsNoConflict2 = _interopRequireDefault(_handlebarsNoConflict);
 
@@ -37388,7 +37452,7 @@ module.exports = exports['default'];
 
 
 /***/ },
-/* 545 */
+/* 534 */
 /*!*****************************************************!*\
   !*** ./~/handlebars/dist/cjs/handlebars.runtime.js ***!
   \*****************************************************/
@@ -37405,30 +37469,30 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'd
 
 function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj['default'] = obj; return newObj; } }
 
-var _handlebarsBase = __webpack_require__(/*! ./handlebars/base */ 546);
+var _handlebarsBase = __webpack_require__(/*! ./handlebars/base */ 535);
 
 var base = _interopRequireWildcard(_handlebarsBase);
 
 // Each of these augment the Handlebars object. No need to setup here.
 // (This is done to easily share code between commonjs and browse envs)
 
-var _handlebarsSafeString = __webpack_require__(/*! ./handlebars/safe-string */ 560);
+var _handlebarsSafeString = __webpack_require__(/*! ./handlebars/safe-string */ 549);
 
 var _handlebarsSafeString2 = _interopRequireDefault(_handlebarsSafeString);
 
-var _handlebarsException = __webpack_require__(/*! ./handlebars/exception */ 548);
+var _handlebarsException = __webpack_require__(/*! ./handlebars/exception */ 537);
 
 var _handlebarsException2 = _interopRequireDefault(_handlebarsException);
 
-var _handlebarsUtils = __webpack_require__(/*! ./handlebars/utils */ 547);
+var _handlebarsUtils = __webpack_require__(/*! ./handlebars/utils */ 536);
 
 var Utils = _interopRequireWildcard(_handlebarsUtils);
 
-var _handlebarsRuntime = __webpack_require__(/*! ./handlebars/runtime */ 561);
+var _handlebarsRuntime = __webpack_require__(/*! ./handlebars/runtime */ 550);
 
 var runtime = _interopRequireWildcard(_handlebarsRuntime);
 
-var _handlebarsNoConflict = __webpack_require__(/*! ./handlebars/no-conflict */ 562);
+var _handlebarsNoConflict = __webpack_require__(/*! ./handlebars/no-conflict */ 551);
 
 var _handlebarsNoConflict2 = _interopRequireDefault(_handlebarsNoConflict);
 
@@ -37463,7 +37527,7 @@ module.exports = exports['default'];
 
 
 /***/ },
-/* 546 */
+/* 535 */
 /*!**************************************************!*\
   !*** ./~/handlebars/dist/cjs/handlebars/base.js ***!
   \**************************************************/
@@ -37477,17 +37541,17 @@ exports.HandlebarsEnvironment = HandlebarsEnvironment;
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
 
-var _utils = __webpack_require__(/*! ./utils */ 547);
+var _utils = __webpack_require__(/*! ./utils */ 536);
 
-var _exception = __webpack_require__(/*! ./exception */ 548);
+var _exception = __webpack_require__(/*! ./exception */ 537);
 
 var _exception2 = _interopRequireDefault(_exception);
 
-var _helpers = __webpack_require__(/*! ./helpers */ 549);
+var _helpers = __webpack_require__(/*! ./helpers */ 538);
 
-var _decorators = __webpack_require__(/*! ./decorators */ 557);
+var _decorators = __webpack_require__(/*! ./decorators */ 546);
 
-var _logger = __webpack_require__(/*! ./logger */ 559);
+var _logger = __webpack_require__(/*! ./logger */ 548);
 
 var _logger2 = _interopRequireDefault(_logger);
 
@@ -37576,7 +37640,7 @@ exports.logger = _logger2['default'];
 
 
 /***/ },
-/* 547 */
+/* 536 */
 /*!***************************************************!*\
   !*** ./~/handlebars/dist/cjs/handlebars/utils.js ***!
   \***************************************************/
@@ -37709,7 +37773,7 @@ function appendContextPath(contextPath, id) {
 
 
 /***/ },
-/* 548 */
+/* 537 */
 /*!*******************************************************!*\
   !*** ./~/handlebars/dist/cjs/handlebars/exception.js ***!
   \*******************************************************/
@@ -37758,7 +37822,7 @@ module.exports = exports['default'];
 
 
 /***/ },
-/* 549 */
+/* 538 */
 /*!*****************************************************!*\
   !*** ./~/handlebars/dist/cjs/handlebars/helpers.js ***!
   \*****************************************************/
@@ -37772,31 +37836,31 @@ exports.registerDefaultHelpers = registerDefaultHelpers;
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
 
-var _helpersBlockHelperMissing = __webpack_require__(/*! ./helpers/block-helper-missing */ 550);
+var _helpersBlockHelperMissing = __webpack_require__(/*! ./helpers/block-helper-missing */ 539);
 
 var _helpersBlockHelperMissing2 = _interopRequireDefault(_helpersBlockHelperMissing);
 
-var _helpersEach = __webpack_require__(/*! ./helpers/each */ 551);
+var _helpersEach = __webpack_require__(/*! ./helpers/each */ 540);
 
 var _helpersEach2 = _interopRequireDefault(_helpersEach);
 
-var _helpersHelperMissing = __webpack_require__(/*! ./helpers/helper-missing */ 552);
+var _helpersHelperMissing = __webpack_require__(/*! ./helpers/helper-missing */ 541);
 
 var _helpersHelperMissing2 = _interopRequireDefault(_helpersHelperMissing);
 
-var _helpersIf = __webpack_require__(/*! ./helpers/if */ 553);
+var _helpersIf = __webpack_require__(/*! ./helpers/if */ 542);
 
 var _helpersIf2 = _interopRequireDefault(_helpersIf);
 
-var _helpersLog = __webpack_require__(/*! ./helpers/log */ 554);
+var _helpersLog = __webpack_require__(/*! ./helpers/log */ 543);
 
 var _helpersLog2 = _interopRequireDefault(_helpersLog);
 
-var _helpersLookup = __webpack_require__(/*! ./helpers/lookup */ 555);
+var _helpersLookup = __webpack_require__(/*! ./helpers/lookup */ 544);
 
 var _helpersLookup2 = _interopRequireDefault(_helpersLookup);
 
-var _helpersWith = __webpack_require__(/*! ./helpers/with */ 556);
+var _helpersWith = __webpack_require__(/*! ./helpers/with */ 545);
 
 var _helpersWith2 = _interopRequireDefault(_helpersWith);
 
@@ -37813,7 +37877,7 @@ function registerDefaultHelpers(instance) {
 
 
 /***/ },
-/* 550 */
+/* 539 */
 /*!**************************************************************************!*\
   !*** ./~/handlebars/dist/cjs/handlebars/helpers/block-helper-missing.js ***!
   \**************************************************************************/
@@ -37823,7 +37887,7 @@ function registerDefaultHelpers(instance) {
 
 exports.__esModule = true;
 
-var _utils = __webpack_require__(/*! ../utils */ 547);
+var _utils = __webpack_require__(/*! ../utils */ 536);
 
 exports['default'] = function (instance) {
   instance.registerHelper('blockHelperMissing', function (context, options) {
@@ -37861,7 +37925,7 @@ module.exports = exports['default'];
 
 
 /***/ },
-/* 551 */
+/* 540 */
 /*!**********************************************************!*\
   !*** ./~/handlebars/dist/cjs/handlebars/helpers/each.js ***!
   \**********************************************************/
@@ -37874,9 +37938,9 @@ exports.__esModule = true;
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
 
-var _utils = __webpack_require__(/*! ../utils */ 547);
+var _utils = __webpack_require__(/*! ../utils */ 536);
 
-var _exception = __webpack_require__(/*! ../exception */ 548);
+var _exception = __webpack_require__(/*! ../exception */ 537);
 
 var _exception2 = _interopRequireDefault(_exception);
 
@@ -37964,7 +38028,7 @@ module.exports = exports['default'];
 
 
 /***/ },
-/* 552 */
+/* 541 */
 /*!********************************************************************!*\
   !*** ./~/handlebars/dist/cjs/handlebars/helpers/helper-missing.js ***!
   \********************************************************************/
@@ -37977,7 +38041,7 @@ exports.__esModule = true;
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
 
-var _exception = __webpack_require__(/*! ../exception */ 548);
+var _exception = __webpack_require__(/*! ../exception */ 537);
 
 var _exception2 = _interopRequireDefault(_exception);
 
@@ -37998,7 +38062,7 @@ module.exports = exports['default'];
 
 
 /***/ },
-/* 553 */
+/* 542 */
 /*!********************************************************!*\
   !*** ./~/handlebars/dist/cjs/handlebars/helpers/if.js ***!
   \********************************************************/
@@ -38008,7 +38072,7 @@ module.exports = exports['default'];
 
 exports.__esModule = true;
 
-var _utils = __webpack_require__(/*! ../utils */ 547);
+var _utils = __webpack_require__(/*! ../utils */ 536);
 
 exports['default'] = function (instance) {
   instance.registerHelper('if', function (conditional, options) {
@@ -38036,7 +38100,7 @@ module.exports = exports['default'];
 
 
 /***/ },
-/* 554 */
+/* 543 */
 /*!*********************************************************!*\
   !*** ./~/handlebars/dist/cjs/handlebars/helpers/log.js ***!
   \*********************************************************/
@@ -38071,7 +38135,7 @@ module.exports = exports['default'];
 
 
 /***/ },
-/* 555 */
+/* 544 */
 /*!************************************************************!*\
   !*** ./~/handlebars/dist/cjs/handlebars/helpers/lookup.js ***!
   \************************************************************/
@@ -38092,7 +38156,7 @@ module.exports = exports['default'];
 
 
 /***/ },
-/* 556 */
+/* 545 */
 /*!**********************************************************!*\
   !*** ./~/handlebars/dist/cjs/handlebars/helpers/with.js ***!
   \**********************************************************/
@@ -38102,7 +38166,7 @@ module.exports = exports['default'];
 
 exports.__esModule = true;
 
-var _utils = __webpack_require__(/*! ../utils */ 547);
+var _utils = __webpack_require__(/*! ../utils */ 536);
 
 exports['default'] = function (instance) {
   instance.registerHelper('with', function (context, options) {
@@ -38134,7 +38198,7 @@ module.exports = exports['default'];
 
 
 /***/ },
-/* 557 */
+/* 546 */
 /*!********************************************************!*\
   !*** ./~/handlebars/dist/cjs/handlebars/decorators.js ***!
   \********************************************************/
@@ -38148,7 +38212,7 @@ exports.registerDefaultDecorators = registerDefaultDecorators;
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
 
-var _decoratorsInline = __webpack_require__(/*! ./decorators/inline */ 558);
+var _decoratorsInline = __webpack_require__(/*! ./decorators/inline */ 547);
 
 var _decoratorsInline2 = _interopRequireDefault(_decoratorsInline);
 
@@ -38159,7 +38223,7 @@ function registerDefaultDecorators(instance) {
 
 
 /***/ },
-/* 558 */
+/* 547 */
 /*!***************************************************************!*\
   !*** ./~/handlebars/dist/cjs/handlebars/decorators/inline.js ***!
   \***************************************************************/
@@ -38169,7 +38233,7 @@ function registerDefaultDecorators(instance) {
 
 exports.__esModule = true;
 
-var _utils = __webpack_require__(/*! ../utils */ 547);
+var _utils = __webpack_require__(/*! ../utils */ 536);
 
 exports['default'] = function (instance) {
   instance.registerDecorator('inline', function (fn, props, container, options) {
@@ -38197,7 +38261,7 @@ module.exports = exports['default'];
 
 
 /***/ },
-/* 559 */
+/* 548 */
 /*!****************************************************!*\
   !*** ./~/handlebars/dist/cjs/handlebars/logger.js ***!
   \****************************************************/
@@ -38207,7 +38271,7 @@ module.exports = exports['default'];
 
 exports.__esModule = true;
 
-var _utils = __webpack_require__(/*! ./utils */ 547);
+var _utils = __webpack_require__(/*! ./utils */ 536);
 
 var logger = {
   methodMap: ['debug', 'info', 'warn', 'error'],
@@ -38253,7 +38317,7 @@ module.exports = exports['default'];
 
 
 /***/ },
-/* 560 */
+/* 549 */
 /*!*********************************************************!*\
   !*** ./~/handlebars/dist/cjs/handlebars/safe-string.js ***!
   \*********************************************************/
@@ -38277,7 +38341,7 @@ module.exports = exports['default'];
 
 
 /***/ },
-/* 561 */
+/* 550 */
 /*!*****************************************************!*\
   !*** ./~/handlebars/dist/cjs/handlebars/runtime.js ***!
   \*****************************************************/
@@ -38300,15 +38364,15 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'd
 
 function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj['default'] = obj; return newObj; } }
 
-var _utils = __webpack_require__(/*! ./utils */ 547);
+var _utils = __webpack_require__(/*! ./utils */ 536);
 
 var Utils = _interopRequireWildcard(_utils);
 
-var _exception = __webpack_require__(/*! ./exception */ 548);
+var _exception = __webpack_require__(/*! ./exception */ 537);
 
 var _exception2 = _interopRequireDefault(_exception);
 
-var _base = __webpack_require__(/*! ./base */ 546);
+var _base = __webpack_require__(/*! ./base */ 535);
 
 function checkRevision(compilerInfo) {
   var compilerRevision = compilerInfo && compilerInfo[0] || 1,
@@ -38578,7 +38642,7 @@ function executeDecorators(fn, prog, container, depths, data, blockParams) {
 
 
 /***/ },
-/* 562 */
+/* 551 */
 /*!*********************************************************!*\
   !*** ./~/handlebars/dist/cjs/handlebars/no-conflict.js ***!
   \*********************************************************/
@@ -38608,7 +38672,7 @@ module.exports = exports['default'];
 /* WEBPACK VAR INJECTION */}.call(exports, (function() { return this; }())))
 
 /***/ },
-/* 563 */
+/* 552 */
 /*!**********************************************************!*\
   !*** ./~/handlebars/dist/cjs/handlebars/compiler/ast.js ***!
   \**********************************************************/
@@ -38648,7 +38712,7 @@ module.exports = exports['default'];
 
 
 /***/ },
-/* 564 */
+/* 553 */
 /*!***********************************************************!*\
   !*** ./~/handlebars/dist/cjs/handlebars/compiler/base.js ***!
   \***********************************************************/
@@ -38666,19 +38730,19 @@ function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj;
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
 
-var _parser = __webpack_require__(/*! ./parser */ 565);
+var _parser = __webpack_require__(/*! ./parser */ 554);
 
 var _parser2 = _interopRequireDefault(_parser);
 
-var _whitespaceControl = __webpack_require__(/*! ./whitespace-control */ 566);
+var _whitespaceControl = __webpack_require__(/*! ./whitespace-control */ 555);
 
 var _whitespaceControl2 = _interopRequireDefault(_whitespaceControl);
 
-var _helpers = __webpack_require__(/*! ./helpers */ 568);
+var _helpers = __webpack_require__(/*! ./helpers */ 557);
 
 var Helpers = _interopRequireWildcard(_helpers);
 
-var _utils = __webpack_require__(/*! ../utils */ 547);
+var _utils = __webpack_require__(/*! ../utils */ 536);
 
 exports.parser = _parser2['default'];
 
@@ -38705,7 +38769,7 @@ function parse(input, options) {
 
 
 /***/ },
-/* 565 */
+/* 554 */
 /*!*************************************************************!*\
   !*** ./~/handlebars/dist/cjs/handlebars/compiler/parser.js ***!
   \*************************************************************/
@@ -39452,7 +39516,7 @@ exports['default'] = handlebars;
 
 
 /***/ },
-/* 566 */
+/* 555 */
 /*!*************************************************************************!*\
   !*** ./~/handlebars/dist/cjs/handlebars/compiler/whitespace-control.js ***!
   \*************************************************************************/
@@ -39465,7 +39529,7 @@ exports.__esModule = true;
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
 
-var _visitor = __webpack_require__(/*! ./visitor */ 567);
+var _visitor = __webpack_require__(/*! ./visitor */ 556);
 
 var _visitor2 = _interopRequireDefault(_visitor);
 
@@ -39682,7 +39746,7 @@ module.exports = exports['default'];
 
 
 /***/ },
-/* 567 */
+/* 556 */
 /*!**************************************************************!*\
   !*** ./~/handlebars/dist/cjs/handlebars/compiler/visitor.js ***!
   \**************************************************************/
@@ -39695,7 +39759,7 @@ exports.__esModule = true;
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
 
-var _exception = __webpack_require__(/*! ../exception */ 548);
+var _exception = __webpack_require__(/*! ../exception */ 537);
 
 var _exception2 = _interopRequireDefault(_exception);
 
@@ -39831,7 +39895,7 @@ module.exports = exports['default'];
 
 
 /***/ },
-/* 568 */
+/* 557 */
 /*!**************************************************************!*\
   !*** ./~/handlebars/dist/cjs/handlebars/compiler/helpers.js ***!
   \**************************************************************/
@@ -39854,7 +39918,7 @@ exports.preparePartialBlock = preparePartialBlock;
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
 
-var _exception = __webpack_require__(/*! ../exception */ 548);
+var _exception = __webpack_require__(/*! ../exception */ 537);
 
 var _exception2 = _interopRequireDefault(_exception);
 
@@ -40070,7 +40134,7 @@ function preparePartialBlock(open, program, close, locInfo) {
 
 
 /***/ },
-/* 569 */
+/* 558 */
 /*!***************************************************************!*\
   !*** ./~/handlebars/dist/cjs/handlebars/compiler/compiler.js ***!
   \***************************************************************/
@@ -40088,13 +40152,13 @@ exports.compile = compile;
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
 
-var _exception = __webpack_require__(/*! ../exception */ 548);
+var _exception = __webpack_require__(/*! ../exception */ 537);
 
 var _exception2 = _interopRequireDefault(_exception);
 
-var _utils = __webpack_require__(/*! ../utils */ 547);
+var _utils = __webpack_require__(/*! ../utils */ 536);
 
-var _ast = __webpack_require__(/*! ./ast */ 563);
+var _ast = __webpack_require__(/*! ./ast */ 552);
 
 var _ast2 = _interopRequireDefault(_ast);
 
@@ -40651,7 +40715,7 @@ function transformLiteralToPath(sexpr) {
 
 
 /***/ },
-/* 570 */
+/* 559 */
 /*!**************************************************************************!*\
   !*** ./~/handlebars/dist/cjs/handlebars/compiler/javascript-compiler.js ***!
   \**************************************************************************/
@@ -40664,15 +40728,15 @@ exports.__esModule = true;
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
 
-var _base = __webpack_require__(/*! ../base */ 546);
+var _base = __webpack_require__(/*! ../base */ 535);
 
-var _exception = __webpack_require__(/*! ../exception */ 548);
+var _exception = __webpack_require__(/*! ../exception */ 537);
 
 var _exception2 = _interopRequireDefault(_exception);
 
-var _utils = __webpack_require__(/*! ../utils */ 547);
+var _utils = __webpack_require__(/*! ../utils */ 536);
 
-var _codeGen = __webpack_require__(/*! ./code-gen */ 571);
+var _codeGen = __webpack_require__(/*! ./code-gen */ 560);
 
 var _codeGen2 = _interopRequireDefault(_codeGen);
 
@@ -41786,7 +41850,7 @@ module.exports = exports['default'];
 
 
 /***/ },
-/* 571 */
+/* 560 */
 /*!***************************************************************!*\
   !*** ./~/handlebars/dist/cjs/handlebars/compiler/code-gen.js ***!
   \***************************************************************/
@@ -41797,7 +41861,7 @@ module.exports = exports['default'];
 
 exports.__esModule = true;
 
-var _utils = __webpack_require__(/*! ../utils */ 547);
+var _utils = __webpack_require__(/*! ../utils */ 536);
 
 var SourceNode = undefined;
 
@@ -41961,7 +42025,7 @@ module.exports = exports['default'];
 
 
 /***/ },
-/* 572 */
+/* 561 */
 /*!**************************************************************!*\
   !*** ./~/handlebars/dist/cjs/handlebars/compiler/printer.js ***!
   \**************************************************************/
@@ -41977,7 +42041,7 @@ exports.PrintVisitor = PrintVisitor;
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
 
-var _visitor = __webpack_require__(/*! ./visitor */ 567);
+var _visitor = __webpack_require__(/*! ./visitor */ 556);
 
 var _visitor2 = _interopRequireDefault(_visitor);
 

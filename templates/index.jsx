@@ -5,15 +5,15 @@ import {render} from 'react-dom';
 
 var App = React.createClass({
   render: function() {
-  return (
-    <div className="content">
-      {React.Children.map(this.props.children, child => {
-        return React.cloneElement(child, {
-          data: this.state
-        });
-      })}
-    </div>
-  );
+    return (
+      <div className="content">
+        {React.Children.map(this.props.children, child => {
+          return React.cloneElement(child, {
+            data: this.state
+          });
+        })}
+      </div>
+    );
   }
 });
 

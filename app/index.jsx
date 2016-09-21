@@ -14,8 +14,9 @@ var App = React.createClass({
       dbPath: 'DATABASE_URL',
       portType: 'ENV',
       port: 'PORT',
-      dbExists: false,
-      apiExists: true
+      dbExists: true,
+      apiExists: true,
+      frontEndExists: true
     };
   },
   render: function() {
@@ -56,7 +57,7 @@ var LocationElement = React.createClass({
     var nextLink = '';
     if (this.props.data.location){
       nextLink = (
-        <Link to="/server">
+        <Link to="/database">
           <span
             className="btn fright">Next</span>
         </Link>
@@ -147,11 +148,11 @@ var ServerElement = React.createClass({
         </div>
         <div
           className="nav">
-          <Link to="/">
+          <Link to="/database">
             <span
               className="btn fleft">Back</span>
           </Link>
-          <Link to="/database">
+          <Link to="/display">
             <span
               className="btn fright">Next</span>
           </Link>
@@ -173,12 +174,9 @@ var ServerElement = React.createClass({
   }
 });
 
-var DatabaseElement = withRouter(React.createClass({
+var DatabaseElement = React.createClass({
   propTypes: {
-    setMainState: React.PropTypes.func,
-    router: React.PropTypes.shape({
-      push: React.PropTypes.func.isRequired
-    }).isRequired
+    setMainState: React.PropTypes.func
   },
   render: function(){
     var databases = [
@@ -256,13 +254,14 @@ var DatabaseElement = withRouter(React.createClass({
         </div>
         <div
           className="nav">
-          <Link to="/server">
+          <Link to="/">
             <span
               className="btn fleft">Back</span>
           </Link>
-          <span
-            onClick={this.generate}
-            className="btn fright">Generate!</span>
+          <Link to="/server">
+            <span
+              className="btn fright">Next</span>
+          </Link>
         </div>
       </div>
     )
@@ -278,12 +277,8 @@ var DatabaseElement = withRouter(React.createClass({
   },
   changeDbExists: function(e){
     this.props.setMainState({dbExists: e.target.checked});
-  },
-  generate: function(){
-    this.props.generate();
-    this.props.router.push('/summary');
   }
-}));
+});
 
 var SummaryElement = React.createClass({
   render: function(){
@@ -310,12 +305,60 @@ var SummaryElement = React.createClass({
   }
 });
 
+var DisplayElement = withRouter(React.createClass({
+  propTypes: {
+    setMainState: React.PropTypes.func,
+    router: React.PropTypes.shape({
+      push: React.PropTypes.func.isRequired
+    }).isRequired
+  },
+  render: function(){
+    return (
+      <div>
+        <h2>Display</h2>
+        <div
+          className="option-row">
+          <span
+            className="label">
+            Has front-end?
+          </span>
+          <label className="switch fright">
+            <input
+              type="checkbox"
+              checked={this.props.data.frontEndExists}
+              onChange={this.changeFrontEndExists}/>
+            <div className="slider round"></div>
+          </label>
+        </div>
+        <div
+          className="nav">
+          <Link to="/server">
+            <span
+              className="btn fleft">Back</span>
+          </Link>
+          <span
+            onClick={this.generate}
+            className="btn fright">Generate!</span>
+        </div>
+      </div>
+    )
+  },
+  changeFrontEndExists: function(e){
+    this.props.setMainState({frontEndExists: e.target.checked});
+  },
+  generate: function(){
+    this.props.generate();
+    this.props.router.push('/summary');
+  }
+}));
+
 render(
   <Router history={hashHistory}>
     <Route path="/" component={App}>
       <IndexRoute component={LocationElement}/>
-      <Route path="server" component={ServerElement}/>
       <Route path="database" component={DatabaseElement}/>
+      <Route path="server" component={ServerElement}/>
+      <Route path="display" component={DisplayElement}/>
       <Route path="summary" component={SummaryElement}/>
     </Route>
   </Router>,
