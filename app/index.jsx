@@ -56,7 +56,7 @@ var LocationElement = React.createClass({
       nextLink = (
         <Link to="/server">
           <span
-            className="btn">Next</span>
+            className="btn fright">Next</span>
         </Link>
       );
     }
@@ -74,7 +74,6 @@ var LocationElement = React.createClass({
           className="btn">Open Folder</span>
         <div
           className="nav">
-          <span></span>
           {nextLink}
         </div>
       </div>
@@ -105,30 +104,40 @@ var ServerElement = React.createClass({
         <h2>Server</h2>
         <div>
           <h3>Server Options</h3>
-          Port Type
-          <select
-            onChange={this.changePortType}
-            value={this.props.data.portType}>
-            <option
-              value="ENV">Environment Variable</option>
-            <option
-              value="NUMBER">Hard Coded Number</option>
-          </select><br/>
-          Port
-          <input
-            type={inputType}
-            value={this.props.data.port}
-            onChange={this.changePort}/>
+          <div
+            className="option-row">
+            <span
+              className="label">Port Type</span>
+            <select
+              onChange={this.changePortType}
+              value={this.props.data.portType}
+              className="fright">
+              <option
+                value="ENV">Environment Variable</option>
+              <option
+                value="NUMBER">Hard Coded Number</option>
+            </select>
+          </div>
+          <div
+            className="option-row">
+            <span
+              className="label">Port</span>
+              <input
+                type={inputType}
+                value={this.props.data.port}
+                onChange={this.changePort}
+                className="fright"/>
+          </div>
         </div>
         <div
           className="nav">
           <Link to="/">
             <span
-              className="btn">Back</span>
+              className="btn fleft">Back</span>
           </Link>
           <Link to="/database">
             <span
-              className="btn">Next</span>
+              className="btn fright">Next</span>
           </Link>
         </div>
       </div>
@@ -169,40 +178,53 @@ var DatabaseElement = withRouter(React.createClass({
     return (
       <div>
         <h2>Database</h2>
-        <div>
-          Select your database<br/>
+        <div
+          className="option-row">
+          <span
+            className="label">Select your database</span>
           <select
             onChange={this.selectDb}
-            value={this.props.data.db}>
+            value={this.props.data.db}
+            className="fright">
             {databaseOptions}
           </select>
         </div>
         <div>
           <h3>Database Credentials</h3>
-          Type
-          <select
-            onChange={this.changeType}
-            value={this.props.data.dbUrlType}>
-            <option
-              value="ENV">Environment Variable</option>
-            <option
-              value="URL">Hard Coded URL</option>
-          </select><br/>
-          Path
-          <input
-            type="text"
-            value={this.props.data.dbPath}
-            onChange={this.changePath}/>
-        </div>
+          <div
+            className="option-row">
+            <span
+              className="label">Type</span>
+            <select
+              onChange={this.changeType}
+              value={this.props.data.dbUrlType}
+              className="fright">
+              <option
+                value="ENV">Environment Variable</option>
+              <option
+                value="URL">Hard Coded URL</option>
+            </select>
+          </div>
+          <div
+            className="option-row">
+            <span
+              className="label">Path</span>
+              <input
+                type="text"
+                value={this.props.data.dbPath}
+                onChange={this.changePath}
+                className="fright"/>
+            </div>
+          </div>
         <div
           className="nav">
           <Link to="/server">
             <span
-              className="btn">Back</span>
+              className="btn fleft">Back</span>
           </Link>
           <span
             onClick={this.generate}
-            className="btn">Generate!</span>
+            className="btn fright">Generate!</span>
         </div>
       </div>
     )

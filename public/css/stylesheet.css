@@ -46,10 +46,9 @@ select, input, .display {
   background-color: #a5a5a5;
 }
 .nav {
-  display: flex;
-  justify-content: space-between;
   padding: 5px 0px;
   margin: 5px 0px;
+  overflow: auto;
 }
 h1 {
   font-family: 'Ewert', cursive;
@@ -63,4 +62,18 @@ code {
 }
 p {
   line-height: 1.4em;
+}
+.fleft {
+  float: left;
+}
+.fright {
+  float: right;
+}
+.label {
+  padding: 5px;
+  margin: 3px;
+  float: left;
+}
+.option-row {
+  overflow: auto;
 }

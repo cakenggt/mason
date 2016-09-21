@@ -131,7 +131,7 @@ var LocationElement = _react2.default.createClass({
         _react2.default.createElement(
           'span',
           {
-            className: 'btn' },
+            className: 'btn fright' },
           'Next'
         )
       );
@@ -162,7 +162,6 @@ var LocationElement = _react2.default.createClass({
         'div',
         {
           className: 'nav' },
-        _react2.default.createElement('span', null),
         nextLink
       )
     );
@@ -204,31 +203,52 @@ var ServerElement = _react2.default.createClass({
           null,
           'Server Options'
         ),
-        'Port Type',
         _react2.default.createElement(
-          'select',
+          'div',
           {
-            onChange: this.changePortType,
-            value: this.props.data.portType },
+            className: 'option-row' },
           _react2.default.createElement(
-            'option',
+            'span',
             {
-              value: 'ENV' },
-            'Environment Variable'
+              className: 'label' },
+            'Port Type'
           ),
           _react2.default.createElement(
-            'option',
+            'select',
             {
-              value: 'NUMBER' },
-            'Hard Coded Number'
+              onChange: this.changePortType,
+              value: this.props.data.portType,
+              className: 'fright' },
+            _react2.default.createElement(
+              'option',
+              {
+                value: 'ENV' },
+              'Environment Variable'
+            ),
+            _react2.default.createElement(
+              'option',
+              {
+                value: 'NUMBER' },
+              'Hard Coded Number'
+            )
           )
         ),
-        _react2.default.createElement('br', null),
-        'Port',
-        _react2.default.createElement('input', {
-          type: inputType,
-          value: this.props.data.port,
-          onChange: this.changePort })
+        _react2.default.createElement(
+          'div',
+          {
+            className: 'option-row' },
+          _react2.default.createElement(
+            'span',
+            {
+              className: 'label' },
+            'Port'
+          ),
+          _react2.default.createElement('input', {
+            type: inputType,
+            value: this.props.data.port,
+            onChange: this.changePort,
+            className: 'fright' })
+        )
       ),
       _react2.default.createElement(
         'div',
@@ -240,7 +260,7 @@ var ServerElement = _react2.default.createClass({
           _react2.default.createElement(
             'span',
             {
-              className: 'btn' },
+              className: 'btn fleft' },
             'Back'
           )
         ),
@@ -250,7 +270,7 @@ var ServerElement = _react2.default.createClass({
           _react2.default.createElement(
             'span',
             {
-              className: 'btn' },
+              className: 'btn fright' },
             'Next'
           )
         )
@@ -298,14 +318,20 @@ var DatabaseElement = (0, _reactRouter.withRouter)(_react2.default.createClass({
       ),
       _react2.default.createElement(
         'div',
-        null,
-        'Select your database',
-        _react2.default.createElement('br', null),
+        {
+          className: 'option-row' },
+        _react2.default.createElement(
+          'span',
+          {
+            className: 'label' },
+          'Select your database'
+        ),
         _react2.default.createElement(
           'select',
           {
             onChange: this.selectDb,
-            value: this.props.data.db },
+            value: this.props.data.db,
+            className: 'fright' },
           databaseOptions
         )
       ),
@@ -317,31 +343,52 @@ var DatabaseElement = (0, _reactRouter.withRouter)(_react2.default.createClass({
           null,
           'Database Credentials'
         ),
-        'Type',
         _react2.default.createElement(
-          'select',
+          'div',
           {
-            onChange: this.changeType,
-            value: this.props.data.dbUrlType },
+            className: 'option-row' },
           _react2.default.createElement(
-            'option',
+            'span',
             {
-              value: 'ENV' },
-            'Environment Variable'
+              className: 'label' },
+            'Type'
           ),
           _react2.default.createElement(
-            'option',
+            'select',
             {
-              value: 'URL' },
-            'Hard Coded URL'
+              onChange: this.changeType,
+              value: this.props.data.dbUrlType,
+              className: 'fright' },
+            _react2.default.createElement(
+              'option',
+              {
+                value: 'ENV' },
+              'Environment Variable'
+            ),
+            _react2.default.createElement(
+              'option',
+              {
+                value: 'URL' },
+              'Hard Coded URL'
+            )
           )
         ),
-        _react2.default.createElement('br', null),
-        'Path',
-        _react2.default.createElement('input', {
-          type: 'text',
-          value: this.props.data.dbPath,
-          onChange: this.changePath })
+        _react2.default.createElement(
+          'div',
+          {
+            className: 'option-row' },
+          _react2.default.createElement(
+            'span',
+            {
+              className: 'label' },
+            'Path'
+          ),
+          _react2.default.createElement('input', {
+            type: 'text',
+            value: this.props.data.dbPath,
+            onChange: this.changePath,
+            className: 'fright' })
+        )
       ),
       _react2.default.createElement(
         'div',
@@ -353,7 +400,7 @@ var DatabaseElement = (0, _reactRouter.withRouter)(_react2.default.createClass({
           _react2.default.createElement(
             'span',
             {
-              className: 'btn' },
+              className: 'btn fleft' },
             'Back'
           )
         ),
@@ -361,7 +408,7 @@ var DatabaseElement = (0, _reactRouter.withRouter)(_react2.default.createClass({
           'span',
           {
             onClick: this.generate,
-            className: 'btn' },
+            className: 'btn fright' },
           'Generate!'
         )
       )
