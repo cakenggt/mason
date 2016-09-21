@@ -14,13 +14,16 @@ export var generate = function(state){
 
 function generatePackage(state){
   var db = '';
-  switch(state.db){
-    case 'PostgreSQL':
-      db = `"pg": "^6.1.0"`;
-      break;
-    case 'SQLite':
-      db = `"sqlite": "^2.2.0"`;
-      break;
+  if (state.dbExists){
+    db += `\n\t\t"sequelize": "^3.24.1",`;
+    switch(state.db){
+      case 'PostgreSQL':
+        db += `\n\t\t"pg": "^6.1.0",`;
+        break;
+      case 'SQLite':
+        db += `\n\t\t"sqlite": "^2.2.0",`;
+        break;
+    }
   }
 
   writeFile(
@@ -32,17 +35,24 @@ function generatePackage(state){
 }
 
 function generateModels(state){
-  writeFile(
-    state.location+'/models.js',
-    require('../templates/models.js.js')()
-  );
+  if (state.dbExists){
+    writeFile(
+      state.location+'/models.js',
+      require('../templates/models.js.js')()
+    );
+  }
 }
 
 function generateApi(state){
   mkDir(state.location+'/api', function(err){
+    var models = state.dbExists ?
+    `\n\t//This is the map of all of your sequelize models\n`+
+    `\tlet models = options.models;` : '';
     writeFile(
       state.location+'/api/v1.js',
-      require('../templates/v1.js.js')()
+      require('../templates/v1.js.js')({
+        models: models
+      })
     );
   });
 }
@@ -50,13 +60,24 @@ function generateApi(state){
 function generateIndexJs(state){
   var dbPath = state.dbUrlType === 'ENV' ?
   'process.env.'+state.dbPath : `"${state.dbPath}"`;
+  var db = state.dbExists ?
+    `\nconst Sequelize = require('sequelize');\n`+
+    `const db = new Sequelize(${dbPath}, {\n`+
+    `\tlogging: false\n});\n\n`+
+    `//sync all sequelize models\ndb.sync();\n` : '';
   var port = state.portType === 'ENV' ?
-  'process.env.'+state.port : `${state.port}`;
+    'process.env.'+state.port : `${state.port}`;
+  var models = state.dbExists ?
+    `\nconst models = db.import(__dirname + '/models');\n` : '';
+  var modelsOption = state.dbExists ?
+    `,\n\tmodels: models` : '';
   writeFile(
     state.location+'/index.js',
     require('../templates/index.js.js')({
-      dbPath: dbPath,
-      port: port
+      db: db,
+      port: port,
+      models: models,
+      modelsOption: modelsOption
     })
   );
 }

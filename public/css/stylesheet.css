@@ -77,3 +77,11 @@ p {
 .option-row {
   overflow: auto;
 }
+.collapse {
+  transition: max-height 0.8s;
+  max-height: 600px;
+  overflow: hidden;
+}
+.hidden {
+  max-height: 0;
+}

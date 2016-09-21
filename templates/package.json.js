@@ -15,10 +15,8 @@ module.exports = function(options){
     "express": "^4.14.0",
     "react": "^15.3.1",
     "react-dom": "^15.3.1",
-    "react-router": "^2.7.0",
-    "sequelize": "^3.24.1",
-    "webpack": "^1.13.2",
-    ${options.db}
+    "react-router": "^2.7.0",${options.db}
+    "webpack": "^1.13.2"
   }
 }`;
 };

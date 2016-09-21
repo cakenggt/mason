@@ -13,7 +13,8 @@ var App = React.createClass({
       dbUrlType: 'ENV',
       dbPath: 'DATABASE_URL',
       portType: 'ENV',
-      port: 'PORT'
+      port: 'PORT',
+      dbExists: false
     };
   },
   render: function() {
@@ -175,47 +176,66 @@ var DatabaseElement = withRouter(React.createClass({
         </option>
       )
     });
+    var optionsHidden = this.props.data.dbExists ?
+      'collapse' : 'collapse hidden';
     return (
       <div>
         <h2>Database</h2>
         <div
           className="option-row">
           <span
-            className="label">Select your database</span>
-          <select
-            onChange={this.selectDb}
-            value={this.props.data.db}
-            className="fright">
-            {databaseOptions}
-          </select>
+            className="label">
+            Database Support?
+          </span>
+          <label className="switch fright">
+            <input
+              type="checkbox"
+              value={this.props.data.dbExists}
+              onClick={this.changeDbExists}/>
+            <div class="slider round"></div>
+          </label>
         </div>
-        <div>
-          <h3>Database Credentials</h3>
+        <div
+          className={optionsHidden}>
           <div
             className="option-row">
             <span
-              className="label">Type</span>
+              className="label">Select your database</span>
             <select
-              onChange={this.changeType}
-              value={this.props.data.dbUrlType}
+              onChange={this.selectDb}
+              value={this.props.data.db}
               className="fright">
-              <option
-                value="ENV">Environment Variable</option>
-              <option
-                value="URL">Hard Coded URL</option>
+              {databaseOptions}
             </select>
           </div>
-          <div
-            className="option-row">
-            <span
-              className="label">Path</span>
-              <input
-                type="text"
-                value={this.props.data.dbPath}
-                onChange={this.changePath}
-                className="fright"/>
+          <div>
+            <h3>Database Credentials</h3>
+            <div
+              className="option-row">
+              <span
+                className="label">Type</span>
+              <select
+                onChange={this.changeType}
+                value={this.props.data.dbUrlType}
+                className="fright">
+                <option
+                  value="ENV">Environment Variable</option>
+                <option
+                  value="URL">Hard Coded URL</option>
+              </select>
+            </div>
+            <div
+              className="option-row">
+              <span
+                className="label">Path</span>
+                <input
+                  type="text"
+                  value={this.props.data.dbPath}
+                  onChange={this.changePath}
+                  className="fright"/>
             </div>
           </div>
+        </div>
         <div
           className="nav">
           <Link to="/server">
@@ -237,6 +257,9 @@ var DatabaseElement = withRouter(React.createClass({
   },
   changePath: function(e){
     this.props.setMainState({dbPath: e.target.value});
+  },
+  changeDbExists: function(e){
+    this.props.setMainState({dbExists: e.target.checked});
   },
   generate: function(){
     this.props.generate();

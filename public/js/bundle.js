@@ -75,7 +75,8 @@ var App = _react2.default.createClass({
       dbUrlType: 'ENV',
       dbPath: 'DATABASE_URL',
       portType: 'ENV',
-      port: 'PORT'
+      port: 'PORT',
+      dbExists: false
     };
   },
   render: function render() {
@@ -308,6 +309,7 @@ var DatabaseElement = (0, _reactRouter.withRouter)(_react2.default.createClass({
         elem
       );
     });
+    var optionsHidden = this.props.data.dbExists ? 'collapse' : 'collapse hidden';
     return _react2.default.createElement(
       'div',
       null,
@@ -324,25 +326,22 @@ var DatabaseElement = (0, _reactRouter.withRouter)(_react2.default.createClass({
           'span',
           {
             className: 'label' },
-          'Select your database'
+          'Database Support?'
         ),
         _react2.default.createElement(
-          'select',
-          {
-            onChange: this.selectDb,
-            value: this.props.data.db,
-            className: 'fright' },
-          databaseOptions
+          'label',
+          { className: 'switch fright' },
+          _react2.default.createElement('input', {
+            type: 'checkbox',
+            value: this.props.data.dbExists,
+            onClick: this.changeDbExists }),
+          _react2.default.createElement('div', { 'class': 'slider round' })
         )
       ),
       _react2.default.createElement(
         'div',
-        null,
-        _react2.default.createElement(
-          'h3',
-          null,
-          'Database Credentials'
-        ),
+        {
+          className: optionsHidden },
         _react2.default.createElement(
           'div',
           {
@@ -351,43 +350,71 @@ var DatabaseElement = (0, _reactRouter.withRouter)(_react2.default.createClass({
             'span',
             {
               className: 'label' },
-            'Type'
+            'Select your database'
           ),
           _react2.default.createElement(
             'select',
             {
-              onChange: this.changeType,
-              value: this.props.data.dbUrlType,
+              onChange: this.selectDb,
+              value: this.props.data.db,
               className: 'fright' },
-            _react2.default.createElement(
-              'option',
-              {
-                value: 'ENV' },
-              'Environment Variable'
-            ),
-            _react2.default.createElement(
-              'option',
-              {
-                value: 'URL' },
-              'Hard Coded URL'
-            )
+            databaseOptions
           )
         ),
         _react2.default.createElement(
           'div',
-          {
-            className: 'option-row' },
+          null,
           _react2.default.createElement(
-            'span',
-            {
-              className: 'label' },
-            'Path'
+            'h3',
+            null,
+            'Database Credentials'
           ),
-          _react2.default.createElement('input', {
-            type: 'text',
-            value: this.props.data.dbPath,
-            onChange: this.changePath,
-            className: 'fright' })
+          _react2.default.createElement(
+            'div',
+            {
+              className: 'option-row' },
+            _react2.default.createElement(
+              'span',
+              {
+                className: 'label' },
+              'Type'
+            ),
+            _react2.default.createElement(
+              'select',
+              {
+                onChange: this.changeType,
+                value: this.props.data.dbUrlType,
+                className: 'fright' },
+              _react2.default.createElement(
+                'option',
+                {
+                  value: 'ENV' },
+                'Environment Variable'
+              ),
+              _react2.default.createElement(
+                'option',
+                {
+                  value: 'URL' },
+                'Hard Coded URL'
+              )
+            )
+          ),
+          _react2.default.createElement(
+            'div',
+            {
+              className: 'option-row' },
+            _react2.default.createElement(
+              'span',
+              {
+                className: 'label' },
+              'Path'
+            ),
+            _react2.default.createElement('input', {
+              type: 'text',
+              value: this.props.data.dbPath,
+              onChange: this.changePath,
+              className: 'fright' })
+          )
         )
       ),
       _react2.default.createElement(
@@ -422,6 +449,9 @@ var DatabaseElement = (0, _reactRouter.withRouter)(_react2.default.createClass({
   },
   changePath: function changePath(e) {
     this.props.setMainState({ dbPath: e.target.value });
+  },
+  changeDbExists: function changeDbExists(e) {
+    this.props.setMainState({ dbExists: e.target.checked });
   },
   generate: function generate() {
     this.props.generate();
@@ -37092,13 +37122,16 @@ var generate = exports.generate = function generate(state) {
 
 function generatePackage(state) {
   var db = '';
-  switch (state.db) {
-    case 'PostgreSQL':
-      db = '"pg": "^6.1.0"';
-      break;
-    case 'SQLite':
-      db = '"sqlite": "^2.2.0"';
-      break;
+  if (state.dbExists) {
+    db += '\n\t\t"sequelize": "^3.24.1",';
+    switch (state.db) {
+      case 'PostgreSQL':
+        db += '\n\t\t"pg": "^6.1.0",';
+        break;
+      case 'SQLite':
+        db += '\n\t\t"sqlite": "^2.2.0",';
+        break;
+    }
   }
 
   writeFile(state.location + '/package.json', __webpack_require__(/*! ../templates/package.json.js */ 532)({
@@ -37107,21 +37140,31 @@ function generatePackage(state) {
 }
 
 function generateModels(state) {
-  writeFile(state.location + '/models.js', __webpack_require__(/*! ../templates/models.js.js */ 533)());
+  if (state.dbExists) {
+    writeFile(state.location + '/models.js', __webpack_require__(/*! ../templates/models.js.js */ 533)());
+  }
 }
 
 function generateApi(state) {
   mkDir(state.location + '/api', function (err) {
-    writeFile(state.location + '/api/v1.js', __webpack_require__(/*! ../templates/v1.js.js */ 534)());
+    var models = state.dbExists ? '\n\t//This is the map of all of your sequelize models\n' + '\tlet models = options.models;' : '';
+    writeFile(state.location + '/api/v1.js', __webpack_require__(/*! ../templates/v1.js.js */ 534)({
+      models: models
+    }));
   });
 }
 
 function generateIndexJs(state) {
   var dbPath = state.dbUrlType === 'ENV' ? 'process.env.' + state.dbPath : '"' + state.dbPath + '"';
+  var db = state.dbExists ? '\nconst Sequelize = require(\'sequelize\');\n' + ('const db = new Sequelize(' + dbPath + ', {\n') + '\tlogging: false\n});\n\n' + '//sync all sequelize models\ndb.sync();\n' : '';
   var port = state.portType === 'ENV' ? 'process.env.' + state.port : '' + state.port;
+  var models = state.dbExists ? '\nconst models = db.import(__dirname + \'/models\');\n' : '';
+  var modelsOption = state.dbExists ? ',\n\tmodels: models' : '';
   writeFile(state.location + '/index.js', __webpack_require__(/*! ../templates/index.js.js */ 535)({
-    dbPath: dbPath,
-    port: port
+    db: db,
+    port: port,
+    models: models,
+    modelsOption: modelsOption
   }));
 }
 
@@ -37199,10 +37242,8 @@ module.exports = function(options){
     "express": "^4.14.0",
     "react": "^15.3.1",
     "react-dom": "^15.3.1",
-    "react-router": "^2.7.0",
-    "sequelize": "^3.24.1",
-    "webpack": "^1.13.2",
-    ${options.db}
+    "react-router": "^2.7.0",${options.db}
+    "webpack": "^1.13.2"
   }
 }`;
 };
@@ -37244,9 +37285,7 @@ const prefix = '/api/v1/';
 module.exports = function(options){
 
   //This is your express app object
-  let app = options.app;
-  //This is the map of all of your sequelize models
-  let models = options.models;
+  let app = options.app;${options.models}
 
   /**
    * All of your api routes go here.
@@ -37272,16 +37311,7 @@ module.exports = function(options){
 const express = require('express');
 const app = express();
 const bodyParser = require('body-parser');
-const http = require('http').Server(app);
-const Sequelize = require('sequelize');
-const db = new Sequelize(${options.dbPath}, {
-  logging: false
-});
-
-//sync all sequelize models
-db.sync();
-
-const models = db.import(__dirname + '/models');
+const http = require('http').Server(app);${options.db}${options.models}
 
 //parse application/json
 app.use(bodyParser.json());
@@ -37297,8 +37327,7 @@ http.listen(${options.port}, function(){
 
 //This is the options object that will be passed to the api files
 let apiOptions = {
-  app: app,
-  models: models
+  app: app${options.modelsOption}
 };
 
 //Load the api versions

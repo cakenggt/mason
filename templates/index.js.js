@@ -4,16 +4,7 @@ module.exports = function(options){
 const express = require('express');
 const app = express();
 const bodyParser = require('body-parser');
-const http = require('http').Server(app);
-const Sequelize = require('sequelize');
-const db = new Sequelize(${options.dbPath}, {
-  logging: false
-});
-
-//sync all sequelize models
-db.sync();
-
-const models = db.import(__dirname + '/models');
+const http = require('http').Server(app);${options.db}${options.models}
 
 //parse application/json
 app.use(bodyParser.json());
@@ -29,8 +20,7 @@ http.listen(${options.port}, function(){
 
 //This is the options object that will be passed to the api files
 let apiOptions = {
-  app: app,
-  models: models
+  app: app${options.modelsOption}
 };
 
 //Load the api versions
