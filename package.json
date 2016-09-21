@@ -1,8 +1,11 @@
 {
-  "name": "mason",
+  "name": "stonemason",
   "version": "1.0.0",
   "description": "Electron app for creating microservice stubs",
   "main": "main.js",
+  "bin": {
+    "stonemason": "./bin/stonemason"
+  },
   "scripts": {
     "test": "mocha",
     "start": "electron main.js",

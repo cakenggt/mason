@@ -495,7 +495,7 @@ var SummaryElement = _react2.default.createClass({
       _react2.default.createElement(
         'p',
         null,
-        'Congratulations! Your project is now located at',
+        'Congratulations! Your project is now located at ',
         this.props.data.location
       ),
       _react2.default.createElement(

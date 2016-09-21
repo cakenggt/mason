@@ -286,7 +286,7 @@ var SummaryElement = React.createClass({
       <div>
         <h2>Summary</h2>
         <p>
-          Congratulations! Your project is now located at
+          Congratulations! Your project is now located at&nbsp;
           {this.props.data.location}
         </p>
         <h2>Next Steps</h2>
