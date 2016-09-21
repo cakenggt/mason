@@ -14,7 +14,8 @@ var App = React.createClass({
       dbPath: 'DATABASE_URL',
       portType: 'ENV',
       port: 'PORT',
-      dbExists: false
+      dbExists: false,
+      apiExists: true
     };
   },
   render: function() {
@@ -108,6 +109,20 @@ var ServerElement = React.createClass({
           <div
             className="option-row">
             <span
+              className="label">
+              Has API?
+            </span>
+            <label className="switch fright">
+              <input
+                type="checkbox"
+                checked={this.props.data.apiExists}
+                onChange={this.changeAPIExists}/>
+              <div className="slider round"></div>
+            </label>
+          </div>
+          <div
+            className="option-row">
+            <span
               className="label">Port Type</span>
             <select
               onChange={this.changePortType}
@@ -152,6 +167,9 @@ var ServerElement = React.createClass({
   },
   changePort: function(e){
     this.props.setMainState({port: e.target.value});
+  },
+  changeAPIExists: function(e){
+    this.props.setMainState({apiExists: e.target.checked});
   }
 });
 
@@ -190,9 +208,9 @@ var DatabaseElement = withRouter(React.createClass({
           <label className="switch fright">
             <input
               type="checkbox"
-              value={this.props.data.dbExists}
-              onClick={this.changeDbExists}/>
-            <div class="slider round"></div>
+              checked={this.props.data.dbExists}
+              onChange={this.changeDbExists}/>
+            <div className="slider round"></div>
           </label>
         </div>
         <div

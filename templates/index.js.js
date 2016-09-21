@@ -16,15 +16,7 @@ app.use(express.static('public'));
 //This tells the server to listen
 http.listen(${options.port}, function(){
   console.log('Example app listening on port ${options.port}!');
-});
-
-//This is the options object that will be passed to the api files
-let apiOptions = {
-  app: app${options.modelsOption}
-};
-
-//Load the api versions
-require('./api/v1')(apiOptions);
+});${options.api}
 
 /*
  * This tells the server to always serve index.html no matter what,

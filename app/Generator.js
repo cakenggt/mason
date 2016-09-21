@@ -1,5 +1,6 @@
 var fs = window.require('fs');
 var dialog = window.require('electron').remote.dialog;
+var Mustache = require('mustache');
 
 export var generate = function(state){
   console.log('generating stubs with state', state);
@@ -44,17 +45,19 @@ function generateModels(state){
 }
 
 function generateApi(state){
-  mkDir(state.location+'/api', function(err){
-    var models = state.dbExists ?
-    `\n\t//This is the map of all of your sequelize models\n`+
-    `\tlet models = options.models;` : '';
-    writeFile(
-      state.location+'/api/v1.js',
-      require('../templates/v1.js.js')({
-        models: models
-      })
-    );
-  });
+  if (state.apiExists){
+    mkDir(state.location+'/api', function(err){
+      var models = state.dbExists ?
+      `\n\t//This is the map of all of your sequelize models\n`+
+      `\tlet models = options.models;` : '';
+      writeFile(
+        state.location+'/api/v1.js',
+        require('../templates/v1.js.js')({
+          models: models
+        })
+      );
+    });
+  }
 }
 
 function generateIndexJs(state){
@@ -71,13 +74,17 @@ function generateIndexJs(state){
     `\nconst models = db.import(__dirname + '/models');\n` : '';
   var modelsOption = state.dbExists ?
     `,\n\tmodels: models` : '';
+  var api = state.apiExists ?
+    `\n\n//This is the options object that will be passed to the api files\n`+
+    `let apiOptions = {\n\tapp: app${modelsOption}\n};\n\n`+
+    `//Load the api versions\nrequire('./api/v1')(apiOptions);` : '';
   writeFile(
     state.location+'/index.js',
     require('../templates/index.js.js')({
       db: db,
       port: port,
       models: models,
-      modelsOption: modelsOption
+      api: api
     })
   );
 }
@@ -149,6 +156,18 @@ ${JSON.stringify(err)}`);
     }
     if (callback){
       callback(err);
+    }
+  });
+}
+
+function readFile(path, callback){
+  fs.readFile(path, 'utf8', function(err, data){
+    if (err){
+      dialog.showErrorBox('Error', `Error reading ${path}
+${JSON.stringify(err)}`);
+    }
+    if (callback){
+      callback(err, data);
     }
   });
 }
