@@ -2,9 +2,14 @@
   font-family: 'Ewert';
   src: url('Ewert-Regular.ttf')  format('truetype'); /* Legacy iOS */
 }
+@font-face {
+  font-family: 'Open Sans';
+  src: url('OpenSans-Regular.ttf')  format('truetype'); /* Legacy iOS */
+}
 body {
   background-color: #252525;
   color: #D7CCC8;
+  font-family: 'Open Sans', sans-serif;
 }
 a {
   text-decoration: none;
