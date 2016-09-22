@@ -26,7 +26,7 @@ var App = React.createClass({
         <IndexLink
           to="/">
           <h1>
-            Mason
+            stonemason
           </h1>
         </IndexLink>
         <div>
@@ -282,16 +282,44 @@ var DatabaseElement = React.createClass({
 
 var SummaryElement = React.createClass({
   render: function(){
+    var advice = [];
+    var data = this.props.data;
+    if (data.apiExists || data.dbExists || data.frontEndExists){
+      if (data.dbExists){
+        advice.push(
+          <p
+            key="db">
+            Place your sequelize models in <code>models.js</code>
+          </p>
+        );
+      }
+      if (data.apiExists){
+        advice.push(
+          <p
+            key="api">
+            Place your api endpoints in <code>api/v1.js</code>
+          </p>
+        );
+      }
+      if (data.frontEndExists){
+        advice.push(
+          <p
+            key="frontEnd">
+            Build out your React front-end in <code>app/index.jsx</code>
+          </p>
+        );
+      }
+    }
     return (
       <div>
         <h2>Summary</h2>
         <p>
           Congratulations! Your project is now located at&nbsp;
-          {this.props.data.location}
+          {data.location}
         </p>
         <h2>Next Steps</h2>
         <p>
-          Run <code>npm init</code> in <code>{this.props.data.location}</code> to
+          Run <code>npm init</code> in <code>{data.location}</code> to
           initialize additional project properties.
         </p>
         <p>
@@ -300,6 +328,7 @@ var SummaryElement = React.createClass({
         <p>
           Run <code>npm start</code> to start your server.
         </p>
+        {advice}
       </div>
     )
   }

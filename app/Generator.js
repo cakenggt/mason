@@ -1,6 +1,6 @@
 var fs = window.require('fs');
 var dialog = window.require('electron').remote.dialog;
-var Handlebars = require('handlebars');
+var Handlebars = window.require('handlebars');
 
 export var generate = function(state){
   console.log('generating stubs with state', state);
