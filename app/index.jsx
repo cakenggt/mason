@@ -16,7 +16,8 @@ var App = React.createClass({
       port: 'PORT',
       dbExists: true,
       apiExists: true,
-      frontEndExists: true
+      frontEndExists: true,
+      socketExists: false
     };
   },
   render: function() {
@@ -113,13 +114,10 @@ var ServerElement = React.createClass({
               className="label">
               Has API?
             </span>
-            <label className="switch fright">
-              <input
-                type="checkbox"
-                checked={this.props.data.apiExists}
-                onChange={this.changeAPIExists}/>
-              <div className="slider round"></div>
-            </label>
+            <Slider
+              checked={this.props.data.apiExists}
+              onChange={this.changeAPIExists}
+              class="fright"/>
           </div>
           <div
             className="option-row">
@@ -203,13 +201,10 @@ var DatabaseElement = React.createClass({
             className="label">
             Database Support?
           </span>
-          <label className="switch fright">
-            <input
-              type="checkbox"
-              checked={this.props.data.dbExists}
-              onChange={this.changeDbExists}/>
-            <div className="slider round"></div>
-          </label>
+          <Slider
+            checked={this.props.data.dbExists}
+            onChange={this.changeDbExists}
+            class="fright"/>
         </div>
         <div
           className={optionsHidden}>
@@ -308,6 +303,14 @@ var SummaryElement = React.createClass({
             Build out your React front-end in <code>app/index.jsx</code>
           </p>
         );
+        if (data.socketExists){
+          advice.push(
+            <p
+              key="sockets">
+              Build out your sockets in <code>sockets.js</code>
+            </p>
+          )
+        }
       }
     }
     return (
@@ -342,6 +345,8 @@ var DisplayElement = withRouter(React.createClass({
     }).isRequired
   },
   render: function(){
+    var optionsHidden = this.props.data.frontEndExists ?
+      'collapse' : 'collapse hidden';
     return (
       <div>
         <h2>Display</h2>
@@ -351,13 +356,24 @@ var DisplayElement = withRouter(React.createClass({
             className="label">
             Has front-end?
           </span>
-          <label className="switch fright">
-            <input
-              type="checkbox"
-              checked={this.props.data.frontEndExists}
-              onChange={this.changeFrontEndExists}/>
-            <div className="slider round"></div>
-          </label>
+          <Slider
+            checked={this.props.data.frontEndExists}
+            onChange={this.changeFrontEndExists}
+            class="fright"/>
+        </div>
+        <div
+          className={optionsHidden}>
+          <div
+            className="option-row">
+            <span
+              className="label">
+              Has socket.io support?
+            </span>
+            <Slider
+              checked={this.props.data.socketExists}
+              onChange={this.changeSocketExists}
+              class="fright"/>
+          </div>
         </div>
         <div
           className="nav">
@@ -375,11 +391,35 @@ var DisplayElement = withRouter(React.createClass({
   changeFrontEndExists: function(e){
     this.props.setMainState({frontEndExists: e.target.checked});
   },
+  changeSocketExists: function(e){
+    this.props.setMainState({socketExists: e.target.checked});
+  },
   generate: function(){
     this.props.generate();
     this.props.router.push('/summary');
   }
 }));
+
+var Slider = React.createClass({
+  propTypes: {
+    onChange: React.PropTypes.func.isRequired,
+    checked: React.PropTypes.bool.isRequired,
+    class: React.PropTypes.string
+  },
+  render: function(){
+    var labelClass = 'switch ' + this.props.class;
+    return (
+      <label
+        className={labelClass}>
+        <input
+          type="checkbox"
+          checked={this.props.checked}
+          onChange={this.props.onChange}/>
+        <div className="slider round"></div>
+      </label>
+    );
+  }
+});
 
 render(
   <Router history={hashHistory}>

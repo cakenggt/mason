@@ -7,6 +7,7 @@ export var generate = function(state){
   generatePackage(state);
   generateModels(state);
   generateApi(state);
+  generateSockets(state);
   generateIndexJs(state);
   generateConfigs(state);
   generateApp(state);
@@ -63,6 +64,19 @@ function generateApi(state){
   }
 }
 
+function generateSockets(state){
+  if (state.socketExists){
+    readFile('templates/sockets.js', function(err, data){
+      writeFile(
+        state.location+'/sockets.js',
+        Handlebars.compile(data)({
+          state: state
+        })
+      );
+    });
+  }
+}
+
 function generateIndexJs(state){
   var db = state.dbUrlType === 'ENV' ?
   'process.env.'+state.dbPath : `"${state.dbPath}"`;
@@ -110,7 +124,9 @@ function generateApp(state){
       readFile('templates/index.jsx', function(err, data){
         writeFile(
           state.location+'/app/index.jsx',
-          Handlebars.compile(data)()
+          Handlebars.compile(data)({
+            state: state
+          })
         );
       });
     });
@@ -124,7 +140,9 @@ function generatePublic(state){
         readFile('templates/index.html', function(err, data){
           writeFile(
             state.location+'/public/html/index.html',
-            Handlebars.compile(data)()
+            Handlebars.compile(data)({
+              state: state
+            })
           );
         });
       });

@@ -78,7 +78,8 @@ var App = _react2.default.createClass({
       port: 'PORT',
       dbExists: true,
       apiExists: true,
-      frontEndExists: true
+      frontEndExists: true,
+      socketExists: false
     };
   },
   render: function render() {
@@ -216,15 +217,10 @@ var ServerElement = _react2.default.createClass({
               className: 'label' },
             'Has API?'
           ),
-          _react2.default.createElement(
-            'label',
-            { className: 'switch fright' },
-            _react2.default.createElement('input', {
-              type: 'checkbox',
-              checked: this.props.data.apiExists,
-              onChange: this.changeAPIExists }),
-            _react2.default.createElement('div', { className: 'slider round' })
-          )
+          _react2.default.createElement(Slider, {
+            checked: this.props.data.apiExists,
+            onChange: this.changeAPIExists,
+            'class': 'fright' })
         ),
         _react2.default.createElement(
           'div',
@@ -350,15 +346,10 @@ var DatabaseElement = _react2.default.createClass({
             className: 'label' },
           'Database Support?'
         ),
-        _react2.default.createElement(
-          'label',
-          { className: 'switch fright' },
-          _react2.default.createElement('input', {
-            type: 'checkbox',
-            checked: this.props.data.dbExists,
-            onChange: this.changeDbExists }),
-          _react2.default.createElement('div', { className: 'slider round' })
-        )
+        _react2.default.createElement(Slider, {
+          checked: this.props.data.dbExists,
+          onChange: this.changeDbExists,
+          'class': 'fright' })
       ),
       _react2.default.createElement(
         'div',
@@ -525,6 +516,19 @@ var SummaryElement = _react2.default.createClass({
             'app/index.jsx'
           )
         ));
+        if (data.socketExists) {
+          advice.push(_react2.default.createElement(
+            'p',
+            {
+              key: 'sockets' },
+            'Build out your sockets in ',
+            _react2.default.createElement(
+              'code',
+              null,
+              'sockets.js'
+            )
+          ));
+        }
       }
     }
     return _react2.default.createElement(
@@ -600,6 +604,7 @@ var DisplayElement = (0, _reactRouter.withRouter)(_react2.default.createClass({
     }).isRequired
   },
   render: function render() {
+    var optionsHidden = this.props.data.frontEndExists ? 'collapse' : 'collapse hidden';
     return _react2.default.createElement(
       'div',
       null,
@@ -618,14 +623,29 @@ var DisplayElement = (0, _reactRouter.withRouter)(_react2.default.createClass({
             className: 'label' },
           'Has front-end?'
         ),
+        _react2.default.createElement(Slider, {
+          checked: this.props.data.frontEndExists,
+          onChange: this.changeFrontEndExists,
+          'class': 'fright' })
+      ),
+      _react2.default.createElement(
+        'div',
+        {
+          className: optionsHidden },
         _react2.default.createElement(
-          'label',
-          { className: 'switch fright' },
-          _react2.default.createElement('input', {
-            type: 'checkbox',
-            checked: this.props.data.frontEndExists,
-            onChange: this.changeFrontEndExists }),
-          _react2.default.createElement('div', { className: 'slider round' })
+          'div',
+          {
+            className: 'option-row' },
+          _react2.default.createElement(
+            'span',
+            {
+              className: 'label' },
+            'Has socket.io support?'
+          ),
+          _react2.default.createElement(Slider, {
+            checked: this.props.data.socketExists,
+            onChange: this.changeSocketExists,
+            'class': 'fright' })
         )
       ),
       _react2.default.createElement(
@@ -655,11 +675,37 @@ var DisplayElement = (0, _reactRouter.withRouter)(_react2.default.createClass({
   changeFrontEndExists: function changeFrontEndExists(e) {
     this.props.setMainState({ frontEndExists: e.target.checked });
   },
+  changeSocketExists: function changeSocketExists(e) {
+    this.props.setMainState({ socketExists: e.target.checked });
+  },
   generate: function generate() {
     this.props.generate();
     this.props.router.push('/summary');
   }
 }));
+
+var Slider = _react2.default.createClass({
+  displayName: 'Slider',
+
+  propTypes: {
+    onChange: _react2.default.PropTypes.func.isRequired,
+    checked: _react2.default.PropTypes.bool.isRequired,
+    class: _react2.default.PropTypes.string
+  },
+  render: function render() {
+    var labelClass = 'switch ' + this.props.class;
+    return _react2.default.createElement(
+      'label',
+      {
+        className: labelClass },
+      _react2.default.createElement('input', {
+        type: 'checkbox',
+        checked: this.props.checked,
+        onChange: this.props.onChange }),
+      _react2.default.createElement('div', { className: 'slider round' })
+    );
+  }
+});
 
 (0, _reactDom.render)(_react2.default.createElement(
   _reactRouter.Router,
@@ -37252,6 +37298,7 @@ var generate = exports.generate = function generate(state) {
   generatePackage(state);
   generateModels(state);
   generateApi(state);
+  generateSockets(state);
   generateIndexJs(state);
   generateConfigs(state);
   generateApp(state);
@@ -37299,6 +37346,16 @@ function generateApi(state) {
   }
 }
 
+function generateSockets(state) {
+  if (state.socketExists) {
+    readFile('templates/sockets.js', function (err, data) {
+      writeFile(state.location + '/sockets.js', Handlebars.compile(data)({
+        state: state
+      }));
+    });
+  }
+}
+
 function generateIndexJs(state) {
   var db = state.dbUrlType === 'ENV' ? 'process.env.' + state.dbPath : '"' + state.dbPath + '"';
   var port = state.portType === 'ENV' ? 'process.env.' + state.port : '' + state.port;
@@ -37330,7 +37387,9 @@ function generateApp(state) {
   if (state.frontEndExists) {
     mkDir(state.location + '/app', function (err) {
       readFile('templates/index.jsx', function (err, data) {
-        writeFile(state.location + '/app/index.jsx', Handlebars.compile(data)());
+        writeFile(state.location + '/app/index.jsx', Handlebars.compile(data)({
+          state: state
+        }));
       });
     });
   }
@@ -37341,7 +37400,9 @@ function generatePublic(state) {
     mkDir(state.location + '/public', function (err) {
       mkDir(state.location + '/public/html', function (err) {
         readFile('templates/index.html', function (err, data) {
-          writeFile(state.location + '/public/html/index.html', Handlebars.compile(data)());
+          writeFile(state.location + '/public/html/index.html', Handlebars.compile(data)({
+            state: state
+          }));
         });
       });
       mkDir(state.location + '/public/css', function (err) {

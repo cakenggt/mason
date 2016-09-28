@@ -15,6 +15,9 @@
     "react-dom": "^15.3.1",
     "react-router": "^2.7.0",
     "webpack": "^1.13.2",
+    {{#if state.socketExists}}
+    "socket.io": "^1.4.8",
+    {{/if}}
     {{/if}}
     {{#if state.dbExists}}
     "sequelize": "^3.24.1",

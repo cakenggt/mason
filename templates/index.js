@@ -51,4 +51,13 @@ require('./api/v1')(apiOptions);
 app.get('*', function(req, res){
   res.sendFile(__dirname+'/public/html/index.html');
 });
+{{#if state.socketExists}}
+
+var socketOptions = {
+  app: http{{#if state.dbExists}},
+  models: models{{/if}}
+};
+//Load the socket file
+require('./sockets')(socketOptions);
+{{/if}}
 {{/if}}

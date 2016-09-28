@@ -1,7 +1,8 @@
 import 'babel-polyfill';
 import React from 'react';
 import {Router, Route, IndexRoute, browserHistory} from 'react-router';
-import {render} from 'react-dom';
+import {render} from 'react-dom';{{#if state.socketExists}}
+var socket = io.connect('');{{/if}}
 
 var App = React.createClass({
   render: function() {
