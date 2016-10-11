@@ -11,7 +11,8 @@
     "start": "electron main.js",
     "dev-start": "electron main.js -D",
     "build": "webpack -p",
-    "watch": "webpack -d --watch"
+    "watch": "webpack -d --watch",
+    "preversion": "webpack -p"
   },
   "keywords": [
     "electron",

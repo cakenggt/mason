@@ -17,7 +17,8 @@ var App = React.createClass({
       dbExists: true,
       apiExists: true,
       frontEndExists: true,
-      socketExists: false
+      socketExists: false,
+      reduxExists: false
     };
   },
   render: function() {
@@ -367,6 +368,17 @@ var DisplayElement = withRouter(React.createClass({
             className="option-row">
             <span
               className="label">
+              Has redux?
+            </span>
+            <Slider
+              checked={this.props.data.reduxExists}
+              onChange={this.changeReduxExists}
+              class="fright"/>
+          </div>
+          <div
+            className="option-row">
+            <span
+              className="label">
               Has socket.io support?
             </span>
             <Slider
@@ -393,6 +405,9 @@ var DisplayElement = withRouter(React.createClass({
   },
   changeSocketExists: function(e){
     this.props.setMainState({socketExists: e.target.checked});
+  },
+  changeReduxExists: function(e){
+    this.props.setMainState({reduxExists: e.target.checked});
   },
   generate: function(){
     this.props.generate();
