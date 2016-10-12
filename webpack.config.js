@@ -22,6 +22,11 @@ var config = {
   },
   resolve: {
     extensions: ['', '.json', '.jsx', '.js']
+  },
+  externals: {
+    handlebars: 'require(\'handlebars\')',
+    fs: 'require(\'fs\')',
+    electron: 'require(\'electron\')'
   }
 };
 

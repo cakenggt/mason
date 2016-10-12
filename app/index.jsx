@@ -2,7 +2,7 @@ import 'babel-polyfill';
 import React from 'react';
 import {Router, Route, IndexRoute, IndexLink, Link, hashHistory, withRouter} from 'react-router';
 import {render} from 'react-dom';
-const {dialog} = window.require('electron').remote;
+const {dialog} = require('electron').remote;
 import {generate} from './generator';
 
 var App = React.createClass({
@@ -47,7 +47,11 @@ var App = React.createClass({
     this.setState(state);
   },
   generate: function(){
-    generate(this.state);
+    generate(this.state, {
+      error: function(msg){
+        dialog.showErrorBox('Error', msg);
+      }
+    });
   }
 });
 

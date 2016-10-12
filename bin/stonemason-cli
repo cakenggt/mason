@@ -1,0 +1,144 @@
+#!/usr/bin/env node
+
+const chalk = require('chalk');
+const inquirer = require('inquirer');
+const generate = require('../app/Generator').generate;
+const path = require('path');
+
+/*
+{
+  location: '',
+  db: 'PostgreSQL',
+  dbUrlType: 'ENV',
+  dbPath: 'DATABASE_URL',
+  portType: 'ENV',
+  port: 'PORT',
+  dbExists: true,
+  apiExists: true,
+  frontEndExists: true,
+  socketExists: false,
+  reduxExists: false
+}
+*/
+
+inquirer.prompt([
+  {
+    type: 'input',
+    name: 'location',
+    message: 'Where do you want your project started?',
+    default: path.resolve('./')
+  },
+  {
+    type: 'confirm',
+    name: 'dbExists',
+    message: 'Database Support?',
+    default: true
+  },
+  {
+    type: 'list',
+    name: 'db',
+    message: 'Select your database',
+    choices: [
+      'PostgreSQL',
+      'SQLite'
+    ],
+    default: 'PostgreSQL',
+    when: function(answers){
+      return answers.dbExists;
+    }
+  },
+  {
+    type: 'list',
+    name: 'dbUrlType',
+    message: 'Database URL Type',
+    choices: [
+      {
+        name: 'Environment Variable',
+        value: 'ENV',
+        short: 'Env'
+      },
+      {
+        name: 'Hard Coded URL',
+        value: 'URL',
+        short: 'Url'
+      }
+    ],
+    default: 'ENV',
+    when: function(answers){
+      return answers.dbExists;
+    }
+  },
+  {
+    type: 'input',
+    name: 'dbPath',
+    message: 'Database Path',
+    default: 'DATABASE_URL',
+    when: function(answers){
+      return answers.dbExists;
+    }
+  },
+  {
+    type: 'confirm',
+    name: 'apiExists',
+    message: 'Has API?',
+    default: true
+  },
+  {
+    type: 'list',
+    name: 'portType',
+    message: 'Port Type',
+    choices: [
+      {
+        name: 'Environment Variable',
+        value: 'ENV',
+        short: 'Env'
+      },
+      {
+        name: 'Hard Coded Number',
+        value: 'NUMBER',
+        short: 'Num'
+      }
+    ],
+    default: 'ENV'
+  },
+  {
+    type: 'input',
+    name: 'port',
+    message: 'Port',
+    default: 'PORT'
+  },
+  {
+    type: 'confirm',
+    name: 'frontEndExists',
+    message: 'Has front-end?',
+    default: true
+  },
+  {
+    type: 'confirm',
+    name: 'reduxExists',
+    message: 'Has redux?',
+    default: false
+  },
+  {
+    type: 'confirm',
+    name: 'socketExists',
+    message: 'Has socket.io support?',
+    default: false
+  }
+])
+.then(function(answers){
+  generate(answers, {
+    error: function(msg){
+      console.log(chalk.white.bgRed(msg));
+    }
+  });
+  console.log(chalk.green('Stonemason finished!'));
+  console.log(
+    chalk.green(
+      'Run '+chalk.underline.white('npm install')+
+      ' to install dependencies and then '+
+      chalk.underline.white('npm start')+
+      ' to start your server'
+    )
+  );
+});

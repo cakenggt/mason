@@ -15,3 +15,9 @@ Calling it from the command line will start the electron app
 `stonemason`
 
 The idea of the app is that at the end of the generation process, you should be able to just perform `npm install` and then be able to run `npm start` to have a working server running, complete with the files necessary to build out your api, react, and db model stubs.
+
+Additionally, a cli is provided. Navigate to the folder where you want your app to reside (or choose it's location during the question process), and run
+
+`stonemason-cli`
+
+and answer a few questions about your app to generate the server.

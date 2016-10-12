@@ -1,20 +1,18 @@
-var fs = window.require('fs');
-var dialog = window.require('electron').remote.dialog;
-var Handlebars = window.require('handlebars');
+var fs = require('fs');
+var Handlebars = require('handlebars');
 
-export var generate = function(state){
-  console.log('generating stubs with state', state);
-  generatePackage(state);
-  generateModels(state);
-  generateApi(state);
-  generateSockets(state);
-  generateIndexJs(state);
-  generateConfigs(state);
-  generateApp(state);
-  generatePublic(state);
+exports.generate = function(state, options){
+  generatePackage(state, options);
+  generateModels(state, options);
+  generateApi(state, options);
+  generateSockets(state, options);
+  generateIndexJs(state, options);
+  generateConfigs(state, options);
+  generateApp(state, options);
+  generatePublic(state, options);
 };
 
-function generatePackage(state){
+function generatePackage(state, options){
   var db = '';
   if (state.dbExists){
     switch(state.db){
@@ -27,142 +25,153 @@ function generatePackage(state){
     }
   }
 
-  readFile('templates/package.json', function(err, data){
+  readFile('templates/package.json', options.error, function(err, data){
     writeFile(
       state.location+'/package.json',
       Handlebars.compile(data)({
         state: state,
         db: db
-      })
+      }),
+      options.error
     );
   });
 }
 
-function generateModels(state){
+function generateModels(state, options){
   if (state.dbExists){
-    readFile('templates/models.js', function(err, data){
+    readFile('templates/models.js', options.error, function(err, data){
       writeFile(
         state.location+'/models.js',
-        Handlebars.compile(data)()
+        Handlebars.compile(data)(),
+        options.error
       );
     });
   }
 }
 
-function generateApi(state){
+function generateApi(state, options){
   if (state.apiExists){
-    mkDir(state.location+'/api', function(err){
-      readFile('templates/v1.js', function(err, data){
+    mkDir(state.location+'/api', options.error, function(err){
+      readFile('templates/v1.js', options.error, function(err, data){
         writeFile(
           state.location+'/api/v1.js',
           Handlebars.compile(data)({
             state: state
-          })
+          }),
+          options.error
         );
       });
     });
   }
 }
 
-function generateSockets(state){
+function generateSockets(state, options){
   if (state.socketExists){
-    readFile('templates/sockets.js', function(err, data){
+    readFile('templates/sockets.js', options.error, function(err, data){
       writeFile(
         state.location+'/sockets.js',
         Handlebars.compile(data)({
           state: state
-        })
+        }),
+        options.error
       );
     });
   }
 }
 
-function generateIndexJs(state){
+function generateIndexJs(state, options){
   var db = state.dbUrlType === 'ENV' ?
   'process.env.'+state.dbPath : `"${state.dbPath}"`;
   var port = state.portType === 'ENV' ?
     'process.env.'+state.port : `${state.port}`;
 
-  readFile('templates/index.js', function(err, data){
+  readFile('templates/index.js', options.error, function(err, data){
     writeFile(
       state.location+'/index.js',
       Handlebars.compile(data)({
         db: db,
         port: port,
         state: state
-      })
+      }),
+      options.error
     );
   });
 }
 
-function generateConfigs(state){
+function generateConfigs(state, options){
   if (state.frontEndExists){
-    readFile('templates/webpack.config.js', function(err, data){
+    readFile('templates/webpack.config.js', options.error, function(err, data){
       writeFile(
         state.location+'/webpack.config.js',
-        Handlebars.compile(data)()
+        Handlebars.compile(data)(),
+        options.error
       );
     });
-    readFile('templates/.babelrc', function(err, data){
+    readFile('templates/.babelrc', options.error, function(err, data){
       writeFile(
         state.location+'/.babelrc',
-        Handlebars.compile(data)()
+        Handlebars.compile(data)(),
+        options.error
       );
     });
   }
-  readFile('templates/.gitignore', function(err, data){
+  readFile('templates/.gitignore', options.error, function(err, data){
     writeFile(
       state.location+'/.gitignore',
-      Handlebars.compile(data)()
+      Handlebars.compile(data)(),
+      options.error
     );
   });
 }
 
-function generateApp(state){
+function generateApp(state, options){
   if (state.frontEndExists){
-    mkDir(state.location+'/app', function(err){
-      readFile('templates/index.jsx', function(err, data){
+    mkDir(state.location+'/app', options.error, function(err){
+      readFile('templates/index.jsx', options.error, function(err, data){
         writeFile(
           state.location+'/app/index.jsx',
           Handlebars.compile(data)({
             state: state
-          })
+          }),
+          options.error
         );
       });
     });
   }
 }
 
-function generatePublic(state){
+function generatePublic(state, options){
   if (state.frontEndExists){
-    mkDir(state.location+'/public', function(err){
-      mkDir(state.location+'/public/html', function(err){
-        readFile('templates/index.html', function(err, data){
+    mkDir(state.location+'/public', options.error, function(err){
+      mkDir(state.location+'/public/html', options.error, function(err){
+        readFile('templates/index.html', options.error, function(err, data){
           writeFile(
             state.location+'/public/html/index.html',
             Handlebars.compile(data)({
               state: state
-            })
+            }),
+            options.error
           );
         });
       });
-      mkDir(state.location+'/public/css', function(err){
-        readFile('templates/stylesheet.css', function(err, data){
+      mkDir(state.location+'/public/css', options.error, function(err){
+        readFile('templates/stylesheet.css', options.error, function(err, data){
           writeFile(
             state.location+'/public/css/stylesheet.css',
-            Handlebars.compile(data)()
+            Handlebars.compile(data)(),
+            options.error
           );
         });
       });
-      mkDir(state.location+'/public/js');
+      mkDir(state.location+'/public/js', options.error);
     });
   }
 }
 
-function mkDir(path, callback){
+function mkDir(path, errorFunc, callback){
   fs.mkdir(path, function(err){
     if (err){
-      dialog.showErrorBox('Error', `Error creating ${path}
+      errorFunc(`Error creating ${path}
 Folder probably already exists
 ${JSON.stringify(err)}`);
     }
@@ -172,10 +181,10 @@ ${JSON.stringify(err)}`);
   });
 }
 
-function writeFile(path, file, callback){
+function writeFile(path, file, errorFunc, callback){
   fs.writeFile(path, file, function(err){
     if (err){
-      dialog.showErrorBox('Error', `Error creating ${path}
+      errorFunc(`Error creating ${path}
 ${JSON.stringify(err)}`);
     }
     if (callback){
@@ -184,10 +193,11 @@ ${JSON.stringify(err)}`);
   });
 }
 
-function readFile(path, callback){
+function readFile(path, errorFunc, callback){
+  path = __dirname+'/../'+path;
   fs.readFile(path, 'utf8', function(err, data){
     if (err){
-      dialog.showErrorBox('Error', `Error reading ${path}
+      errorFunc(`Error reading ${path}
 ${JSON.stringify(err)}`);
     }
     if (callback){
