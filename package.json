@@ -1,6 +1,6 @@
 {
   "name": "stonemason",
-  "version": "2.2.1",
+  "version": "2.2.2",
   "description": "Electron app for creating microservice stubs",
   "main": "main.js",
   "bin": {
