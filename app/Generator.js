@@ -115,7 +115,7 @@ function generateConfigs(state, options){
       );
     });
   }
-  readFile(options.pkgDir+'/templates/.gitignore', options.error, function(err, data){
+  readFile(options.pkgDir+'/templates/.gitignore-file', options.error, function(err, data){
     writeFile(
       state.location+'/.gitignore',
       Handlebars.compile(data)(),
