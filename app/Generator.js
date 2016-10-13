@@ -25,7 +25,7 @@ function generatePackage(state, options){
     }
   }
 
-  readFile('templates/package.json', options.error, function(err, data){
+  readFile(options.pkgDir+'/templates/package.json', options.error, function(err, data){
     writeFile(
       state.location+'/package.json',
       Handlebars.compile(data)({
@@ -39,7 +39,7 @@ function generatePackage(state, options){
 
 function generateModels(state, options){
   if (state.dbExists){
-    readFile('templates/models.js', options.error, function(err, data){
+    readFile(options.pkgDir+'/templates/models.js', options.error, function(err, data){
       writeFile(
         state.location+'/models.js',
         Handlebars.compile(data)(),
@@ -52,7 +52,7 @@ function generateModels(state, options){
 function generateApi(state, options){
   if (state.apiExists){
     mkDir(state.location+'/api', options.error, function(err){
-      readFile('templates/v1.js', options.error, function(err, data){
+      readFile(options.pkgDir+'/templates/v1.js', options.error, function(err, data){
         writeFile(
           state.location+'/api/v1.js',
           Handlebars.compile(data)({
@@ -67,7 +67,7 @@ function generateApi(state, options){
 
 function generateSockets(state, options){
   if (state.socketExists){
-    readFile('templates/sockets.js', options.error, function(err, data){
+    readFile(options.pkgDir+'/templates/sockets.js', options.error, function(err, data){
       writeFile(
         state.location+'/sockets.js',
         Handlebars.compile(data)({
@@ -85,7 +85,7 @@ function generateIndexJs(state, options){
   var port = state.portType === 'ENV' ?
     'process.env.'+state.port : `${state.port}`;
 
-  readFile('templates/index.js', options.error, function(err, data){
+  readFile(options.pkgDir+'/templates/index.js', options.error, function(err, data){
     writeFile(
       state.location+'/index.js',
       Handlebars.compile(data)({
@@ -100,14 +100,14 @@ function generateIndexJs(state, options){
 
 function generateConfigs(state, options){
   if (state.frontEndExists){
-    readFile('templates/webpack.config.js', options.error, function(err, data){
+    readFile(options.pkgDir+'/templates/webpack.config.js', options.error, function(err, data){
       writeFile(
         state.location+'/webpack.config.js',
         Handlebars.compile(data)(),
         options.error
       );
     });
-    readFile('templates/.babelrc', options.error, function(err, data){
+    readFile(options.pkgDir+'/templates/.babelrc', options.error, function(err, data){
       writeFile(
         state.location+'/.babelrc',
         Handlebars.compile(data)(),
@@ -115,7 +115,7 @@ function generateConfigs(state, options){
       );
     });
   }
-  readFile('templates/.gitignore', options.error, function(err, data){
+  readFile(options.pkgDir+'/templates/.gitignore', options.error, function(err, data){
     writeFile(
       state.location+'/.gitignore',
       Handlebars.compile(data)(),
@@ -127,7 +127,7 @@ function generateConfigs(state, options){
 function generateApp(state, options){
   if (state.frontEndExists){
     mkDir(state.location+'/app', options.error, function(err){
-      readFile('templates/index.jsx', options.error, function(err, data){
+      readFile(options.pkgDir+'/templates/index.jsx', options.error, function(err, data){
         writeFile(
           state.location+'/app/index.jsx',
           Handlebars.compile(data)({
@@ -144,7 +144,7 @@ function generatePublic(state, options){
   if (state.frontEndExists){
     mkDir(state.location+'/public', options.error, function(err){
       mkDir(state.location+'/public/html', options.error, function(err){
-        readFile('templates/index.html', options.error, function(err, data){
+        readFile(options.pkgDir+'/templates/index.html', options.error, function(err, data){
           writeFile(
             state.location+'/public/html/index.html',
             Handlebars.compile(data)({
@@ -155,7 +155,7 @@ function generatePublic(state, options){
         });
       });
       mkDir(state.location+'/public/css', options.error, function(err){
-        readFile('templates/stylesheet.css', options.error, function(err, data){
+        readFile(options.pkgDir+'/templates/stylesheet.css', options.error, function(err, data){
           writeFile(
             state.location+'/public/css/stylesheet.css',
             Handlebars.compile(data)(),
@@ -194,7 +194,6 @@ ${JSON.stringify(err)}`);
 }
 
 function readFile(path, errorFunc, callback){
-  path = __dirname+'/../'+path;
   fs.readFile(path, 'utf8', function(err, data){
     if (err){
       errorFunc(`Error reading ${path}

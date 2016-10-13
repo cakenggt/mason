@@ -2,8 +2,9 @@ import 'babel-polyfill';
 import React from 'react';
 import {Router, Route, IndexRoute, IndexLink, Link, hashHistory, withRouter} from 'react-router';
 import {render} from 'react-dom';
-const {dialog} = require('electron').remote;
+const {dialog, app} = require('electron').remote;
 import {generate} from './generator';
+import path from 'path';
 
 var App = React.createClass({
   getInitialState: function() {
@@ -50,7 +51,8 @@ var App = React.createClass({
     generate(this.state, {
       error: function(msg){
         dialog.showErrorBox('Error', msg);
-      }
+      },
+      pkgDir: app.getAppPath()
     });
   }
 });

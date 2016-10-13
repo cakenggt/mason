@@ -26,7 +26,7 @@ inquirer.prompt([
     type: 'input',
     name: 'location',
     message: 'Where do you want your project started?',
-    default: path.resolve('./')
+    default: path.resolve('.')
   },
   {
     type: 'confirm',
@@ -130,7 +130,8 @@ inquirer.prompt([
   generate(answers, {
     error: function(msg){
       console.log(chalk.white.bgRed(msg));
-    }
+    },
+    pkgDir: path.resolve(__dirname, '..')
   });
   console.log(chalk.green('Stonemason finished!'));
   console.log(
