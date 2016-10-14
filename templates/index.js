@@ -10,10 +10,10 @@ const db = new Sequelize({{{db}}}, {
   logging: false
 });
 
+const models = db.import(__dirname + '/models');
+
 //sync all sequelize models
 db.sync();
-
-const models = db.import(__dirname + '/models');
 {{/if}}
 
 //parse application/json
