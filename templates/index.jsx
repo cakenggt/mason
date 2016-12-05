@@ -4,21 +4,24 @@ import {Router, Route, IndexRoute, browserHistory} from 'react-router';
 import {render} from 'react-dom';
 {{#if state.reduxExists}}
 import {Provider, connect} from 'react-redux';
-import {createStore} from 'redux';
+import {createStore, combineReducers, applyMiddleware} from 'redux';
+import thunk from 'redux-thunk';
+import dataReducer from './reducers/dataReducer.js';
+import {loadData} from './actionCreators/dataActions.js';
 {{/if}}
 {{#if state.socketExists}}
 var socket = io.connect('');
 {{/if}}
 
 {{#if state.reduxExists}}
-var reducer = function(state = {}, action){
-  switch (action.type){
-    default:
-      return state;
-  }
-};
+var reducer = combineReducers({
+  data: dataReducer
+});
 
-var store = createStore(reducer);
+var store = createStore(
+  reducer,
+  applyMiddleware(thunk)
+);
 {{/if}}
 
 {{#unless state.reduxExists}}
@@ -37,7 +40,24 @@ var App = React.createClass({
 });
 {{/unless}}
 
-var Index = {{#if state.reduxExists}}connect()({{/if}}React.createClass({
+var mapStateToProps = (state) => {
+  return {
+    data: state.data
+  }
+}
+
+var mapDispatchToProps = (dispatch) => {
+  return {
+    loadData: function(newData){
+      dispatch(loadData(newData));
+    }
+  }
+}
+
+var Index = {{#if state.reduxExists}}connect(
+  mapStateToProps,
+  mapDispatchToProps
+)({{/if}}React.createClass({
   render: function() {
     return (
       <div></div>

@@ -136,8 +136,36 @@ function generateApp(state, options){
           options.error
         );
       });
+      if (state.reduxExists){
+        generateRedux(state, options);
+      }
     });
   }
+}
+
+function generateRedux(state, options){
+  mkDir(state.location+'/app/actionCreators', options.error, function(err){
+    readFile(options.pkgDir+'/templates/dataActions.js', options.error, function(err, data){
+      writeFile(
+        state.location+'/app/actionCreators/dataActions.js',
+        Handlebars.compile(data)({
+          state: state
+        }),
+        options.error
+      );
+    });
+  });
+  mkDir(state.location+'/app/reducers', options.error, function(err){
+    readFile(options.pkgDir+'/templates/dataReducer.js', options.error, function(err, data){
+      writeFile(
+        state.location+'/app/reducers/dataReducer.js',
+        Handlebars.compile(data)({
+          state: state
+        }),
+        options.error
+      );
+    });
+  });
 }
 
 function generatePublic(state, options){
