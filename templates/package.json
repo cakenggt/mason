@@ -1,7 +1,8 @@
 {
   "main": "index.js",
   "scripts": {
-    "start": "{{#if state.frontEndExists}}webpack -p && {{/if}}node index.js"{{#if state.frontEndExists}},
+    "start": "node index.js"{{#if state.frontEndExists}},
+    "postinstall": "webpack -p",
     "build": "webpack -p",
     "watch": "webpack -d --watch"{{/if}}
   },
